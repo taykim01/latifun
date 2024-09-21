@@ -38,7 +38,7 @@ export const updateSession = async (request: NextRequest) => {
         }
 
         return response;
-    } catch (e) {
+    } catch {
         return NextResponse.next({
             request: {
                 headers: request.headers,
