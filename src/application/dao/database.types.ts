@@ -11,21 +11,27 @@ export type Database = {
     Tables: {
       code: {
         Row: {
+          content: string
           created_at: string
+          extension: string
           filepath: string
           id: string
           metadata: Json
           project_id: string
         }
         Insert: {
+          content: string
           created_at?: string
+          extension: string
           filepath: string
           id?: string
           metadata?: Json
           project_id: string
         }
         Update: {
+          content?: string
           created_at?: string
+          extension?: string
           filepath?: string
           id?: string
           metadata?: Json
@@ -130,7 +136,15 @@ export type Database = {
           name?: string
           profile_img?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profile_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project: {
         Row: {
@@ -169,6 +183,61 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      use_case: {
+        Row: {
+          code_id: string | null
+          created_at: string
+          description: string
+          id: string
+          project_id: string
+          test_code_id: string | null
+          test_success: boolean
+          title: string
+        }
+        Insert: {
+          code_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          project_id: string
+          test_code_id?: string | null
+          test_success: boolean
+          title: string
+        }
+        Update: {
+          code_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          project_id?: string
+          test_code_id?: string | null
+          test_success?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "use_case_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "code"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "use_case_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "use_case_test_code_id_fkey"
+            columns: ["test_code_id"]
+            isOneToOne: false
+            referencedRelation: "code"
             referencedColumns: ["id"]
           },
         ]

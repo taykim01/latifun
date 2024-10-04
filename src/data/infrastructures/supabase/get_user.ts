@@ -7,5 +7,5 @@ export default async function getUserID() {
     const {
         data: { user },
     } = await database.auth.getUser();
-    return user?.id;
+    return user;
 }
