@@ -1,8 +1,7 @@
 // oauth login callback route
+import { createClient } from "@/data/infrastructures/supabase/server";
 import { NextResponse } from "next/server";
 // The client you created from the Server-Side Auth instructions
-import { createClient } from "@/utils/supabase/server";
-import { prisma } from "@/utils/prisma";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -12,19 +11,15 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createClient();
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.exchangeCodeForSession(code);
+    const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!sessionError) {
       // if the user doesn't have profile data yet, send them to the onboarding page
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", sessionData.user.id);
+      const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", sessionData.user.id);
 
       if (profile?.length === 0) {
         next = "/onboarding";
-        const { data: insertData, error: insertError } = await supabase
+        const {} = await supabase
           .from("profiles")
           .insert([
             {
@@ -52,8 +47,6 @@ export async function GET(request: Request) {
 
   // return the user to an error page with instructions
   return NextResponse.redirect(
-    `${origin}/login?message=${encodeURIComponent(
-      "로그인에 실패했습니다. 다시 시도해주세요."
-    )}`
+    `${origin}/login?message=${encodeURIComponent("로그인에 실패했습니다. 다시 시도해주세요.")}`
   );
 }

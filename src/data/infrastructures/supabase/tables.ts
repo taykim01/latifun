@@ -1,10 +1,10 @@
 const TABLES = {
-  PROFILE: "PROFILE",
-  PROJECT: "PROJECT",
-  NODE: "NODE",
-  CODE: "CODE",
-  LLM_RESPNSE: "LLM_RESPONSE",
-  DEPLOYMENT: "DEPLOYMENT",
+  PROFILE: "profile",
+  PROJECT: "project",
+  NODE: "node",
+  CODE: "code",
+  LLM_RESPNSE: "llm_response",
+  DEPLOYMENT: "deployment",
 };
 
 export default TABLES;

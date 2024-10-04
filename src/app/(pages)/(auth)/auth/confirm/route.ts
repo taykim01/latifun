@@ -1,4 +1,4 @@
-// signup, email magic link confirmatiom route
+// email signup, email magic link confirmatiom route
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 

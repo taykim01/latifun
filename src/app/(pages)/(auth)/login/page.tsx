@@ -1,30 +1,28 @@
 import { cookies } from "next/headers";
 import {
   signInWithEmailPassword,
-  signInWithMagicLink,
+  // signInWithMagicLink,
   signUp,
 } from "../actions";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+
+import { Button } from "@/presentation/shadcn/button";
+import { Label } from "@/presentation/shadcn/label";
+import { Input } from "@/presentation/shadcn/input";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
+  // CardDescription,
+  // CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@/presentation/shadcn/card";
+import { Separator } from "@/presentation/shadcn/separator";
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
-import { OAuthButtons } from "./oauth-signin";
 
-export default async function login({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
+import { OAuthButtons } from "./oauth-signin";
+import { createClient } from "@/data/infrastructures/supabase/server";
+
+export default async function login() {
   const cookieJar = cookies();
   const lastSignedInMethod = cookieJar.get("lastSignedInMethod")?.value;
 
@@ -47,31 +45,15 @@ export default async function login({
           <form id="login-form" className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">이메일</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="nextjs@example.com"
-                required
-              />
+              <Input id="email" name="email" type="email" placeholder="nextjs@example.com" required />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">비밀번호</Label>
               </div>
-              <Input
-                minLength={8}
-                name="password"
-                id="password"
-                type="password"
-                placeholder="********"
-                required
-              />
+              <Input minLength={8} name="password" id="password" type="password" placeholder="********" required />
             </div>
-            <Button
-              formAction={signInWithEmailPassword}
-              className="relative w-full"
-            >
+            <Button formAction={signInWithEmailPassword} className="relative w-full">
               로그인
               {lastSignedInMethod === "email" && (
                 <div className="absolute top-1/2 -translate-y-1/2 left-full whitespace-nowrap ml-8 bg-accent px-4 py-1 rounded-md text-xs text-foreground/80">

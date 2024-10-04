@@ -6,14 +6,14 @@ import crypto from "crypto";
 import { createClient } from "@/data/infrastructures/supabase/server";
 import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
-import { files } from "@/core/files/next14_shadcn_ddd";
+import { Next14ShadcnDDD } from "@/core/files/type1/next14_shadcn_ddd";
 
-interface FormValues {
-  title: string;
-  supabaseUrl: string;
-  supabaseAnonKey: string;
-  vercelToken: string;
-}
+// interface FormValues {
+//   title: string;
+//   supabaseUrl: string;
+//   supabaseAnonKey: string;
+//   vercelToken: string;
+// }
 
 interface VercelAPIError {
   error: {
@@ -40,12 +40,18 @@ interface UploadedFile {
   sha: string;
 }
 
-export default async function createEmptyProjectUseCase(formData: FormValues) {
+export default async function createEmptyProjectUseCase() {
+  // export default async function createEmptyProjectUseCase(formData: FormValues) {
   // Supabase 클라이언트를 생성합니다.
   const supabase = createClient();
 
-  const { title, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
-  const PROJECT_NAME = title;
+  // const { title, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
+  const PROJECT_NAME = "next14_shadcn_ddd";
+  const supabaseId = "hkmmkrotpewlzazmgcju";
+  const supabaseUrl = "https://hkmmkrotpewlzazmgcju.supabase.co";
+  const supabaseAnonKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrbW1rcm90cGV3bHphem1nY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjQ4ODUsImV4cCI6MjA0MzY0MDg4NX0.Q9pmAThZpiaTCNoFEgNHzNFUBPlKZQThevnXpx0d5gc";
+  const vercelToken = "WxEfexDHtSK4TPYqs4xCODyD";
 
   // 사용자 정보를 가져옵니다.
   const {
@@ -58,14 +64,16 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
 
   // user_id를 사용하여 profile 정보를 가져옵니다.
   const { data: profileData, error: profileError } = await supabase
-    .from(TABLES.PROFILE)
+    .from("profile")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .single();
 
   if (profileError) {
     throw new Error(`프로필 정보를 가져오는 중 오류 발생: ${profileError.message}`);
   }
+
+  console.log(`프로필 정보: ${profileData.id} (${profileData.email})`);
 
   try {
     let project: VercelProject | null = null;
@@ -141,6 +149,7 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
           supabase_anon_key: supabaseAnonKey,
           supabase_api_key: "", // 필요한 경우 설정하세요.
           vercel_api_key: vercelToken,
+          domain: project.autoAssignCustomDomains,
         })
         .select()
         .single();
@@ -161,6 +170,7 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
     console.log("파일 업로드 중...");
     const uploadedFiles: UploadedFile[] = [];
 
+    const files = Next14ShadcnDDD(PROJECT_NAME, supabaseId);
     for (const file of files) {
       const contentBuffer = Buffer.from(file.content.trim(), "utf8");
       const sha1sum = crypto.createHash("sha1").update(contentBuffer).digest("hex");
@@ -185,6 +195,20 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
 
         const fileExtension = file.filePath.slice(file.filePath.lastIndexOf("."));
 
+        // 동일한 project_id와 filepath를 가진 기존 레코드들을 모두 latest: false로 업데이트
+        const { error: updateError } = await supabase
+          .from(TABLES.CODE)
+          .update({ latest: false })
+          .eq("project_id", projectRow.id)
+          .eq("filepath", file.filePath);
+
+        if (updateError) {
+          throw new Error(
+            `기존 코드의 latest 필드를 false로 업데이트하는 중 오류 발생 (${file.filePath}): ${updateError.message}`
+          );
+        }
+
+        // 새로운 code 레코드 삽입
         const { error: codeInsertError } = await supabase.from(TABLES.CODE).insert({
           project_id: projectRow.id, // projectRow의 id 사용
           content: file.content.trim(),
@@ -275,7 +299,6 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
     // 배포 정보를 데이터베이스에 저장
     const { error: deploymentInsertError } = await supabase.from(TABLES.DEPLOYMENT).insert({
       project_id: projectRow.id, // projectRow의 id 사용
-      deployment_id: deployment.id,
       url: deployment.url,
     });
 

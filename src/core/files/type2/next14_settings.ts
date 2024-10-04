@@ -1,7 +1,10 @@
-export const files = [
-  {
-    filePath: "src/app/globals.css",
-    content: `
+// shadcn ui를 사용하는 nextjs 프로젝트 세팅
+
+export const Next14Settings = () => {
+  return [
+    {
+      filePath: "src/app/globals.css",
+      content: `
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,7 +34,7 @@ export const files = [
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
     --background: 224 71.4% 4.1%;
@@ -57,7 +60,7 @@ export const files = [
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
 @layer base {
@@ -67,14 +70,30 @@ export const files = [
   body {
     @apply bg-background text-foreground;
   }
+  :root {
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
 `,
-  },
-  {
-    filePath: "src/app/layout.tsx",
-    content: `
+    },
+    {
+      filePath: "src/app/layout.tsx",
+      content: `
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 
 export const metadata: Metadata = {
@@ -92,14 +111,15 @@ export default function RootLayout({
       <body>
         {children}
       </body>
+      <Toaster />
     </html>
   );
 }
 `,
-  },
-  {
-    filePath: "src/app/page.tsx",
-    content: `
+    },
+    {
+      filePath: "src/app/page.tsx",
+      content: `
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -110,18 +130,23 @@ export default function Home() {
   );
 }
 `,
-  },
-  {
-    filePath: ".eslintrc.json",
-    content: `
+    },
+    {
+      filePath: ".eslintrc.json",
+      content: `
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-empty-object-type": "off"
+  }
 }
 `,
-  },
-  {
-    filePath: ".gitignore",
-    content: `
+    },
+    {
+      filePath: ".gitignore",
+      content: `
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -159,31 +184,31 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 `,
-  },
-  {
-    filePath: "next-env.d.ts",
-    content: `
+    },
+    {
+      filePath: "next-env.d.ts",
+      content: `
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
 
 // NOTE: This file should not be edited
 // see https://nextjs.org/docs/app/building-your-application/configuring/typescript for more information.
 `,
-  },
-  {
-    filePath: "next.config.mjs",
-    content: `
+    },
+    {
+      filePath: "next.config.mjs",
+      content: `
 /** @type {import('next').NextConfig} */
 const nextConfig = {};
 
 export default nextConfig;
 `,
-  },
-  {
-    filePath: "package.json",
-    content: `
+    },
+    {
+      filePath: "package.json",
+      content: `
 {
-  "name": "create-next-app",
+  "name": "latifun",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -193,17 +218,58 @@ export default nextConfig;
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-accordion": "^1.2.1",
+    "@radix-ui/react-alert-dialog": "^1.1.2",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.1",
+    "@radix-ui/react-checkbox": "^1.1.2",
+    "@radix-ui/react-collapsible": "^1.1.1",
+    "@radix-ui/react-context-menu": "^2.2.2",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-hover-card": "^1.1.2",
     "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-menubar": "^1.1.2",
+    "@radix-ui/react-navigation-menu": "^1.2.1",
+    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.2.1",
+    "@radix-ui/react-scroll-area": "^1.2.0",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-switch": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.2",
+    "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.3",
     "@supabase/ssr": "^0.5.1",
+    "@tanstack/react-table": "^8.20.5",
+    "@xyflow/react": "^12.3.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "embla-carousel-react": "^8.3.0",
+    "input-otp": "^1.2.4",
     "lucide-react": "^0.447.0",
     "next": "14.2.13",
+    "next-themes": "^0.3.0",
     "openai": "^4.67.1",
     "react": "^18",
+    "react-day-picker": "^8.10.1",
     "react-dom": "^18",
+    "react-hook-form": "^7.53.0",
+    "react-resizable-panels": "^2.1.4",
+    "recharts": "^2.12.7",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -219,10 +285,10 @@ export default nextConfig;
   }
 }
 `,
-  },
-  {
-    filePath: "postcss.config.mjs",
-    content: `
+    },
+    {
+      filePath: "postcss.config.mjs",
+      content: `
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
@@ -232,10 +298,10 @@ const config = {
 
 export default config;
 `,
-  },
-  {
-    filePath: "tailwind.config.ts",
-    content: `
+    },
+    {
+      filePath: "tailwind.config.ts",
+      content: `
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate"; // Replace require with import
 
@@ -245,6 +311,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/presentation/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -295,6 +362,33 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
+      },
     },
   },
   plugins: [tailwindcssAnimate], // Use imported plugin
@@ -302,13 +396,17 @@ const config: Config = {
 
 export default config;
 `,
-  },
-  {
-    filePath: "tsconfig.json",
-    content: `
+    },
+    {
+      filePath: "tsconfig.json",
+      content: `
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -326,51 +424,49 @@ export default config;
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@components/*": [
+        "./src/presentation/components/*"
+      ],
+      "@repositories/*": [
+        "./src/data/repositories/*"
+      ],
+      "@supabase/*": [
+        "./src/data/infrastructures/supabase/*"
+      ],
+      "@upstage/*": [
+        "./src/data/infrastructures/upstage/*"
+      ],
+      "@utils/*": [
+        "./src/core/utils/*"
+      ],
+      "@constants/*": [
+        "./src/core/constants/*"
+      ],
+      "@use_cases/*": [
+        "./src/application/use_cases/*"
+      ],
+      "@dto/*": [
+        "./src/application/dto/*"
+      ],
+      "@pages/*": [
+        "./src/app/(pages)/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
 `,
-  },
-  // shadcn ui
-  {
-    filePath: "components.json",
-    content: `
-{
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "new-york",
-  "rsc": true,
-  "tsx": true,
-  "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "src/app/globals.css",
-    "baseColor": "gray",
-    "cssVariables": true,
-    "prefix": ""
-  },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  }
-}`,
-  },
-  {
-    filePath: "src/lib/utils.ts",
-    content: `
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-`,
-  },
-  {
-    filePath: "",
-  },
-];
+    },
+  ];
+};

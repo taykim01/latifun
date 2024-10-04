@@ -1,8 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
+
 import { Provider } from "@supabase/supabase-js";
-import { GoogleIcon } from "@/components/icon";
+
 import { oAuthSignIn } from "../actions";
+import Icons from "@/presentation/components/icons";
+import { Button } from "@/presentation/shadcn/button";
 
 type OAuthProvider = {
   name: Provider;
@@ -10,16 +12,12 @@ type OAuthProvider = {
   icon?: JSX.Element;
 };
 
-export function OAuthButtons({
-  lastSignedInMethod,
-}: {
-  lastSignedInMethod?: string;
-}) {
+export function OAuthButtons({ lastSignedInMethod }: { lastSignedInMethod?: string }) {
   const oAuthProviders: OAuthProvider[] = [
     {
       name: "google",
       displayName: "구글",
-      icon: <GoogleIcon />,
+      icon: <Icons.GoogleIcon />,
     },
   ];
 

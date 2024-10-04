@@ -6,36 +6,36 @@ import Popup from "@/presentation/components/popup";
 import React, { useState } from "react";
 
 export default function CreateProjectButton() {
-    const [popup, setPopup] = useState(false);
+  const [popup, setPopup] = useState(false);
 
-    const handleClickNext = () => {
-        try {
-            createEmptyProjectUseCase();
-        } catch (error) {
-            return;
-        } finally {
-            setPopup(false);
-        }
-    };
+  const handleClickNext = () => {
+    try {
+      createEmptyProjectUseCase();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setPopup(false);
+    }
+  };
 
-    return (
-        <>
-            <Button.Type1 label="Create New" onClick={() => setPopup(true)} />
-            <Popup
-                open={popup}
-                onClose={() => setPopup(false)}
-                title="Create A New Project"
-                buttons={{
-                    back: {
-                        onClick: () => setPopup(false),
-                        text: "Cancel",
-                    },
-                    next: {
-                        onClick: handleClickNext,
-                        text: "Create",
-                    },
-                }}
-            ></Popup>
-        </>
-    );
+  return (
+    <>
+      <Button.Type1 label="Create New" onClick={() => setPopup(true)} />
+      <Popup
+        open={popup}
+        onClose={() => setPopup(false)}
+        title="Create A New Project"
+        buttons={{
+          back: {
+            onClick: () => setPopup(false),
+            text: "Cancel",
+          },
+          next: {
+            onClick: handleClickNext,
+            text: "Create",
+          },
+        }}
+      ></Popup>
+    </>
+  );
 }
