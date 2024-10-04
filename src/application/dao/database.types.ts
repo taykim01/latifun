@@ -16,8 +16,10 @@ export type Database = {
           extension: string
           filepath: string
           id: string
+          latest: boolean
           metadata: Json
           project_id: string
+          sha1sum: string
         }
         Insert: {
           content: string
@@ -25,8 +27,10 @@ export type Database = {
           extension: string
           filepath: string
           id?: string
+          latest: boolean
           metadata?: Json
           project_id: string
+          sha1sum: string
         }
         Update: {
           content?: string
@@ -34,12 +38,43 @@ export type Database = {
           extension?: string
           filepath?: string
           id?: string
+          latest?: boolean
           metadata?: Json
           project_id?: string
+          sha1sum?: string
         }
         Relationships: [
           {
             foreignKeyName: "code_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "project"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deployment: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deployment_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "project"
@@ -149,6 +184,8 @@ export type Database = {
       project: {
         Row: {
           created_at: string
+          custom_domain: string
+          domain: string
           id: string
           profile_id: string | null
           supabase_anon_key: string
@@ -159,6 +196,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_domain: string
+          domain: string
           id?: string
           profile_id?: string | null
           supabase_anon_key: string
@@ -169,6 +208,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_domain?: string
+          domain?: string
           id?: string
           profile_id?: string | null
           supabase_anon_key?: string

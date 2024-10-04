@@ -55,6 +55,7 @@ export default async function generateSchemaCodeUseCase() {
         id: "",
         metadata: "",
         project_id: projectID,
+        latest: true,
     };
 
     await createCode(code);
