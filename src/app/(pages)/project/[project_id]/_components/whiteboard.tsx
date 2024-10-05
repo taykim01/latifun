@@ -15,15 +15,16 @@ import {
   getConnectedEdges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import ExecuteBar from "./execute_bar";
-import Node from "@/presentation/components/node";
+import ExecuteBar, { ActionOptions } from "./execute_bar";
+import Node, { NodeOptions } from "@/presentation/components/node";
 import { createEdgeNodeUseCase, createEmptyNodeUseCase } from "@/application/use_cases/create_empty_node.use_case";
 import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/use_cases/read_my_nodes.use_case";
 import { Tables } from "@/application/dao/database.types";
 import { moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
 import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
+import { convertActionsToNodeType } from "@/core/constants/actions";
+import Components from ".";
 import { Button } from "@/presentation/shadcn/button";
-import generateApplicationUseCase from "@/application/use_cases/generate_application.use_case";
 
 type NodeUI = {
   id: string;
@@ -56,6 +57,7 @@ export type EdgeData = {
 export default function Whiteboard() {
   const [nodes, setNodes] = useState<NodeUI[]>([]);
   const [edges, setEdges] = useState<EdgeUI[]>([]);
+  const [resultBar, setResultBar] = useState<boolean>(false);
   const lastMoveCallTime = useRef(Date.now());
 
   const debounce = (func: Function, wait: number) => {
@@ -166,7 +168,7 @@ export default function Whiteboard() {
     []
   );
 
-  const createNewNode = useCallback(async (type: string) => {
+  const createNewNode = useCallback(async (type: NodeOptions) => {
     const nodeID = await createEmptyNodeUseCase({ type: type });
 
     const newNode = {
@@ -205,6 +207,34 @@ export default function Whiteboard() {
     [nodes, edges]
   );
 
+  const onEdgesDelete = useCallback(async (deleted: any[]) => {
+    setEdges((eds) => eds.filter((edge) => !deleted.includes(edge)));
+    await deleteNodeUseCase(deleted[0].id);
+  }, []);
+
+  const executeAction = async (action: ActionOptions) => {
+    const nodeTypes = convertActionsToNodeType(action);
+    const filteredNodes = nodes.filter((node) => nodeTypes.includes(node.type as NodeOptions));
+    const minimizedNodes = filteredNodes.map((node) => {
+      return {
+        id: node.id,
+        type: node.type,
+        data: node.data.defaultText,
+      };
+    });
+
+    const relatedEdges = edges.filter((edge) => {
+      return filteredNodes.some((node) => {
+        return node.id === edge.source || node.id === edge.target;
+      });
+    });
+    const minimizedEdges = relatedEdges.map((edge) => {
+      return "from " + edge.source + " to " + edge.target;
+    });
+
+    console.log(minimizedNodes, minimizedEdges);
+  };
+
   return (
     <div className="w-full h-full relative">
       <ReactFlow
@@ -213,6 +243,7 @@ export default function Whiteboard() {
         edges={edges}
         onEdgesChange={onEdgesChange}
         onNodesDelete={onNodesDelete}
+        onEdgesDelete={onEdgesDelete}
         nodeTypes={nodeTypes}
         onConnect={onConnect}
         fitView
@@ -220,13 +251,11 @@ export default function Whiteboard() {
         <Background />
         <Controls />
       </ReactFlow>
-      <ExecuteBar onClick={createNewNode} />
-      <Button
-        className="absolute bottom-4 right-4"
-        onClick={() => generateApplicationUseCase("3dc43c94-7103-41fe-b554-a507cc172f39")}
-      >
-        Generate Use case
-      </Button>
+      <Components.ExecuteBar onClick={createNewNode} action={executeAction} />
+      <Components.ResultsBar result="hello world" open={resultBar} onClose={() => setResultBar(false)} />
+      <div className="fixed top-8 left-8">
+        <Button onClick={() => setResultBar(!resultBar)}>Show Results</Button>
+      </div>
     </div>
   );
 }
