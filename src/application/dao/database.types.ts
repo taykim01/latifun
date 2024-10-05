@@ -122,6 +122,7 @@ export type Database = {
           created_at: string
           data: Json
           id: string
+          position: Json
           project_id: string
           type: string
         }
@@ -129,6 +130,7 @@ export type Database = {
           created_at?: string
           data?: Json
           id?: string
+          position: Json
           project_id: string
           type: string
         }
@@ -136,6 +138,7 @@ export type Database = {
           created_at?: string
           data?: Json
           id?: string
+          position?: Json
           project_id?: string
           type?: string
         }
@@ -291,7 +294,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      NODE_TYPE:
+        | "USER_FLOW_PAGE"
+        | "USER_FLOW_ACTION"
+        | "USE_CASE"
+        | "SCHEMA_TABLE"
+        | "PRESENTATION_PAGE"
+        | "PRESENTATION_COMPONENT"
+        | "IDEA"
+        | "EDGE"
     }
     CompositeTypes: {
       [_ in never]: never
