@@ -1,12 +1,12 @@
 // 유저 프로필 생성하는 use case
 "use server";
 
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
 
 async function createProfile(profileData: Omit<Tables<"profile">, "id">) {
-  const supabase = createClient();
+  const supabase = serverClient();
   const { data, error } = await supabase.from(TABLES.PROFILE).insert(profileData).select("id");
   if (error) throw new Error(error.message);
   return data;

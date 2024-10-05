@@ -21,8 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="kr">
-      <body className={pretendard.variable}>{children}</body>
-      <Toaster />
+      <body className={pretendard.variable}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

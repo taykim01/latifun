@@ -3,7 +3,7 @@
 
 import fetch from "node-fetch";
 import crypto from "crypto";
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
 import { Next14ShadcnDDD } from "@/core/files/type1/next14_shadcn_ddd";
@@ -43,7 +43,7 @@ interface UploadedFile {
 export default async function createEmptyProjectUseCase() {
   // export default async function createEmptyProjectUseCase(formData: FormValues) {
   // Supabase 클라이언트를 생성합니다.
-  const supabase = createClient();
+  const supabase = serverClient();
 
   // const { title, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
   const PROJECT_NAME = "next14_shadcn_ddd";
@@ -172,7 +172,7 @@ export default async function createEmptyProjectUseCase() {
 
     const files = Next14ShadcnDDD(PROJECT_NAME, supabaseId);
     for (const file of files) {
-      const contentBuffer = Buffer.from(file.content.trim(), "utf8");
+      const contentBuffer = Buffer.from(file.content.trim(), "utf8") as Uint8Array<ArrayBufferLike>;
       const sha1sum = crypto.createHash("sha1").update(contentBuffer).digest("hex");
       const size = contentBuffer.length;
 
@@ -184,7 +184,7 @@ export default async function createEmptyProjectUseCase() {
           "x-vercel-size": size.toString(),
           "Content-Length": size.toString(),
         },
-        body: contentBuffer,
+        body: contentBuffer as any,
       });
 
       if (uploadResponse.ok || uploadResponse.status === 409) {

@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 import { redirect, RedirectType } from "next/navigation";
 import { Provider } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import { getURL } from "@/core/utils/helpers";
+import getUser from "@/data/infrastructures/supabase/get_user";
 
 export async function signInWithEmailPassword(formData: FormData) {
-  const supabase = createClient();
+  const supabase = serverClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -32,7 +33,7 @@ export async function signInWithEmailPassword(formData: FormData) {
 }
 
 export async function signInWithMagicLink(formData: FormData) {
-  const supabase = createClient();
+  const supabase = serverClient();
 
   const data = {
     email: formData.get("email") as string,
@@ -59,7 +60,7 @@ export async function signInWithMagicLink(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
-  const supabase = createClient();
+  const supabase = serverClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -86,7 +87,7 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signOut() {
-  const supabase = createClient();
+  const supabase = serverClient();
   await supabase.auth.signOut({ scope: "local" });
   revalidatePath("/", "layout");
   redirect("/", RedirectType.push);
@@ -97,7 +98,7 @@ export async function oAuthSignIn(provider: Provider) {
     return redirect(`/login?message=${encodeURIComponent("서버에 문제가 발생했습니다. 다시 시도해주세요.")}`);
   }
 
-  const supabase = createClient();
+  const supabase = serverClient();
   const redirectUrl = getURL("/auth/callback");
 
   const { data, error } = await supabase.auth.signInWithOAuth({

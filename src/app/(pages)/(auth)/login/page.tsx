@@ -20,13 +20,13 @@ import { Separator } from "@/presentation/shadcn/separator";
 import { redirect } from "next/navigation";
 
 import { OAuthButtons } from "./oauth-signin";
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 
 export default async function login() {
   const cookieJar = cookies();
   const lastSignedInMethod = cookieJar.get("lastSignedInMethod")?.value;
 
-  const supabase = createClient();
+  const supabase = serverClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

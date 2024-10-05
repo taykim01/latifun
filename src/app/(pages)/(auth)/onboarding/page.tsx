@@ -1,9 +1,9 @@
 // TODO: Add onboarding basic form
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import Image from "next/image";
 
 export default async function Onboarding() {
-  const supabase = createClient();
+  const supabase = serverClient();
 
   const {
     data: { user },

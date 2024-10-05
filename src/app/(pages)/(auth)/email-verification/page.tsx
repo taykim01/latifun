@@ -1,12 +1,12 @@
 // route : /auth/email-verification
 // This page appears when a user sign up with email and password and needs to verify their email address.
 
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const supabase = createClient();
+  const supabase = serverClient();
 
   const {
     data: { user },

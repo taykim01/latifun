@@ -5,6 +5,7 @@ import { Provider } from "@supabase/supabase-js";
 import { oAuthSignIn } from "../actions";
 import Icons from "@/presentation/components/icons";
 import { Button } from "@/presentation/shadcn/button";
+import React from "react";
 
 type OAuthProvider = {
   name: Provider;

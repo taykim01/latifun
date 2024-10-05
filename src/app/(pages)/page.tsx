@@ -1,7 +1,20 @@
 import Card from "@/presentation/components/card";
 import Components from "./_components";
+import getUser from "@/data/infrastructures/supabase/get_user";
+import { redirect } from "next/navigation";
+import readMyProfile from "@/application/use_cases/read_my_profile.use_case";
 
-export default function Home() {
+export default async function Home() {
+  const userData = await getUser();
+  if (userData) {
+    try {
+      const profileData = await readMyProfile(userData.id);
+      if (!profileData) redirect("/onboarding");
+    } catch (error) {
+      redirect("/onboarding");
+    }
+  }
+
   return (
     <div className="w-full h-full flex" style={{ backgroundColor: "#fdfdfd" }}>
       <aside className="min-w-[200px] shadow hover:shadow-lg transition-all duration-300 px-8 pt-12 pb-6 flex flex-col justify-between">

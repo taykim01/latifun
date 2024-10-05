@@ -1,5 +1,5 @@
 // oauth login callback route
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import { NextResponse } from "next/server";
 // The client you created from the Server-Side Auth instructions
 
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   let next = searchParams.get("next") ?? "/";
 
   if (code) {
-    const supabase = createClient();
+    const supabase = serverClient();
     const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!sessionError) {

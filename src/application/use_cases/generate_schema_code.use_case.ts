@@ -3,35 +3,35 @@
 
 import getUserAndProjectID from "@/core/utils/get_project_and_user_id";
 import runCommand from "@/core/utils/run_command";
-import { createClient } from "@/data/infrastructures/supabase/server";
+import { serverClient } from "@/data/infrastructures/supabase/server";
 import llmRepository from "@/data/repositories/llm.repository";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { Tables } from "../dao/database.types";
 import { createCode } from "./generate_application_code.use_case";
 
 async function readUseCaseByProjectID(projectID: string, select?: string) {
-    const supabase = createClient();
-    const { data, error } = await supabase
-        .from("use_case")
-        .select(select || "*")
-        .eq("project_id", projectID);
-    if (error) throw new Error(error.message);
-    return data;
+  const supabase = serverClient();
+  const { data, error } = await supabase
+    .from("use_case")
+    .select(select || "*")
+    .eq("project_id", projectID);
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export default async function generateSchemaCodeUseCase() {
-    // use_case title/description 정보 가져와서 storage,code에 저장
-    // type 업데이트하기
-    // llm_response에 저장
+  // use_case title/description 정보 가져와서 storage,code에 저장
+  // type 업데이트하기
+  // llm_response에 저장
 
-    const { projectID } = await getUserAndProjectID();
+  const { projectID } = await getUserAndProjectID();
 
-    const useCases = await readUseCaseByProjectID(projectID, "title, description");
+  const useCases = await readUseCaseByProjectID(projectID, "title, description");
 
-    const input: ChatCompletionMessageParam[] = [
-        {
-            role: "system",
-            content: `
+  const input: ChatCompletionMessageParam[] = [
+    {
+      role: "system",
+      content: `
             [role] You are a backend senior developer in Supabase and PostgreSQL who is so good at developing that your code never causes any error.
             You need to write a PostgreSQL schema code for the use cases that the user provides.
             Return the result in the following JSON format:
@@ -41,30 +41,31 @@ export default async function generateSchemaCodeUseCase() {
             }
             Do NOT any other information in the code.
     `,
-        },
-        { role: "user", content: JSON.stringify(useCases) },
-    ];
+    },
+    { role: "user", content: JSON.stringify(useCases) },
+  ];
 
-    const response = await llmRepository(input);
+  const response = await llmRepository(input);
 
-    const code: Tables<"code"> = {
-        content: response,
-        created_at: new Date().toISOString(),
-        extension: ".sql",
-        filepath: "src/data/schema/schema.sql",
-        id: "",
-        metadata: "",
-        project_id: projectID,
-        latest: true,
-    };
+  const code: Tables<"code"> = {
+    content: response,
+    created_at: new Date().toISOString(),
+    extension: ".sql",
+    filepath: "src/data/schema/schema.sql",
+    id: "",
+    metadata: "",
+    project_id: projectID,
+    latest: true,
+    sha1sum: "",
+  };
 
-    await createCode(code);
+  await createCode(code);
 
-    await runCommand("npx supabase login");
-    await runCommand("npx supabase init");
-    await runCommand(
-        'npx supabase gen types --lang=typescript --project-id "$PROJECT_REF" --schema public > database.types.ts'
-    );
+  await runCommand("npx supabase login");
+  await runCommand("npx supabase init");
+  await runCommand(
+    'npx supabase gen types --lang=typescript --project-id "$PROJECT_REF" --schema public > database.types.ts'
+  );
 }
 
 // 태은
