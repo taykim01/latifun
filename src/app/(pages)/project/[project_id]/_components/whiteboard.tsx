@@ -17,8 +17,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import ExecuteBar from "./execute_bar";
 import Node from "@/presentation/components/node";
-import createEmptyNodeUseCase from "@/application/use_cases/create_empty_node.use_case";
-import readProjectNodesUseCase from "@/application/use_cases/read_my_nodes.use_case";
+import { createEdgeNodeUseCase, createEmptyNodeUseCase } from "@/application/use_cases/create_empty_node.use_case";
+import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/use_cases/read_my_nodes.use_case";
 import { Tables } from "@/application/dao/database.types";
 import { moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
 import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
@@ -36,7 +36,7 @@ type NodeUI = {
   type: string;
 };
 
-type EdgeUI = {
+export type EdgeUI = {
   id: string;
   source: string;
   target: string;
@@ -44,7 +44,12 @@ type EdgeUI = {
   type: string;
 };
 
-const initialEdges = [{ id: "1-2", source: "1", target: "2", label: "to the", type: "step" }];
+export type EdgeData = {
+  source: string;
+  target: string;
+  sourceHandle: string | null;
+  targetHandle: string | null;
+};
 
 export default function Whiteboard() {
   const [nodes, setNodes] = useState<NodeUI[]>([]);
@@ -63,9 +68,8 @@ export default function Whiteboard() {
     };
   };
 
-  const readInitialNodes = async () => {
+  const readInitialNodesAndEdges = async () => {
     const nodes = await readProjectNodesUseCase();
-
     const newNodes = nodes.map((node: Tables<"node">) => {
       const positions = JSON.parse(node.position as string);
       const UINode: NodeUI = {
@@ -82,12 +86,25 @@ export default function Whiteboard() {
       };
       return UINode;
     });
-
     setNodes(newNodes);
+
+    const edges = await readProjectEdgesUseCase();
+    const newEdges = edges.map((edge: Tables<"node">) => {
+      const edgeData: EdgeData = JSON.parse(edge.data as string);
+      const UIEdge: EdgeUI = {
+        id: edge.id,
+        source: edgeData.source,
+        target: edgeData.target,
+        label: "",
+        type: "EDGE",
+      };
+      return UIEdge;
+    });
+    setEdges(newEdges);
   };
 
   useEffect(() => {
-    readInitialNodes();
+    readInitialNodesAndEdges();
   }, []);
 
   const debouncedMoveNode = useCallback(
@@ -110,12 +127,23 @@ export default function Whiteboard() {
     const changedNode = { x: nodeChange.position.x, y: nodeChange.position.y };
     debouncedMoveNode(nodeChange.id, changedNode);
   }, []);
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange<EdgeUI>[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    []
-  );
 
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), []);
+  const onEdgesChange = useCallback(async (changes: EdgeChange<EdgeUI>[]) => {
+    setEdges((eds) => applyEdgeChanges(changes, eds));
+  }, []);
+
+  const onConnect = useCallback(async (params: any) => {
+    setEdges((eds) => addEdge(params, eds));
+    const newEdge: EdgeData & { id: string } = {
+      source: params.source,
+      target: params.target,
+      sourceHandle: params.sourceHandle,
+      targetHandle: params.targetHandle,
+      id: `${params.source}->${params.target}`,
+    };
+
+    await createEdgeNodeUseCase(newEdge);
+  }, []);
 
   const nodeTypes = useMemo(
     () => ({
