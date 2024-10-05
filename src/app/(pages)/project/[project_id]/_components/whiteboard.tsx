@@ -13,10 +13,11 @@ import {
   getIncomers,
   getOutgoers,
   getConnectedEdges,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import ExecuteBar from "./execute_bar";
-import Node from "@/presentation/components/node";
+import Node, { NodeOptions } from "@/presentation/components/node";
 import { createEdgeNodeUseCase, createEmptyNodeUseCase } from "@/application/use_cases/create_empty_node.use_case";
 import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/use_cases/read_my_nodes.use_case";
 import { Tables } from "@/application/dao/database.types";
@@ -159,7 +160,7 @@ export default function Whiteboard() {
     []
   );
 
-  const createNewNode = useCallback(async (type: string) => {
+  const createNewNode = useCallback(async (type: NodeOptions) => {
     const nodeID = await createEmptyNodeUseCase({ type: type });
 
     const newNode = {
@@ -198,6 +199,11 @@ export default function Whiteboard() {
     [nodes, edges]
   );
 
+  const onEdgesDelete = useCallback(async (deleted: any[]) => {
+    setEdges((eds) => eds.filter((edge) => !deleted.includes(edge)));
+    await deleteNodeUseCase(deleted[0].id);
+  }, []);
+
   return (
     <div className="w-full h-full relative">
       <ReactFlow
@@ -206,6 +212,7 @@ export default function Whiteboard() {
         edges={edges}
         onEdgesChange={onEdgesChange}
         onNodesDelete={onNodesDelete}
+        onEdgesDelete={onEdgesDelete}
         nodeTypes={nodeTypes}
         onConnect={onConnect}
         fitView

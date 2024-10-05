@@ -1,6 +1,7 @@
 "use client";
 
 import { NODE_TYPE, NodeOptions } from "@/presentation/components/node";
+import { Button } from "@/presentation/shadcn/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/presentation/shadcn/select";
 
 export default function ExecuteBar(props: { onClick?: (e: NodeOptions) => void }) {
