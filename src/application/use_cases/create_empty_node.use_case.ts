@@ -2,6 +2,7 @@
 
 import { serverClient } from "@/data/infrastructures/supabase/server";
 import { Tables } from "../dao/database.types";
+import { EdgeData, EdgeUI } from "@/app/(pages)/project/[project_id]/_components/whiteboard";
 
 async function createNode(nodeData: Omit<Tables<"node">, "id" | "created_at">) {
   const supabase = serverClient();
@@ -10,12 +11,24 @@ async function createNode(nodeData: Omit<Tables<"node">, "id" | "created_at">) {
   return data[0].id;
 }
 
-export default async function createEmptyNodeUseCase({ type }: { type: string }) {
+export async function createEmptyNodeUseCase({ type }: { type: string }) {
   const newNode: Omit<Tables<"node">, "id" | "created_at"> = {
     data: "",
     project_id: "3dc43c94-7103-41fe-b554-a507cc172f39",
     type: type,
     position: JSON.stringify({ x: 0, y: 0 }),
+  };
+
+  const nodeID = await createNode(newNode);
+  return nodeID;
+}
+
+export async function createEdgeNodeUseCase(edgeData: EdgeData & { id: string }) {
+  const newNode: Omit<Tables<"node">, "id" | "created_at"> = {
+    data: JSON.stringify(edgeData),
+    project_id: "3dc43c94-7103-41fe-b554-a507cc172f39",
+    type: "EDGE",
+    position: "",
   };
 
   const nodeID = await createNode(newNode);
