@@ -41,7 +41,7 @@ export default function ProfileGroup() {
       onClick={toggleTooltip}
     >
       <div className="rounded-full w-8 h-8 bg-gray-300" />
-      <div className="text-body-regular">{logInText}</div>
+      <div className="text-md">{logInText}</div>
       {tooltip && <ProfileTooltip />}
     </div>
   );

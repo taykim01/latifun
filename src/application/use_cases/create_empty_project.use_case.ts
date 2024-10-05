@@ -8,12 +8,13 @@ import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
 import { Next14ShadcnDDD } from "@/core/files/type1/next14_shadcn_ddd";
 
-// interface FormValues {
-//   title: string;
-//   supabaseUrl: string;
-//   supabaseAnonKey: string;
-//   vercelToken: string;
-// }
+export interface FormValues {
+  PROJECT_NAME: string;
+  supabaseId: string;
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  vercelToken: string;
+}
 
 interface VercelAPIError {
   error: {
@@ -40,18 +41,10 @@ interface UploadedFile {
   sha: string;
 }
 
-export default async function createEmptyProjectUseCase() {
-  // export default async function createEmptyProjectUseCase(formData: FormValues) {
+export default async function createEmptyProjectUseCase(formData: FormValues) {
   // Supabase 클라이언트를 생성합니다.
   const supabase = serverClient();
-
-  // const { title, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
-  const PROJECT_NAME = "next14_shadcn_ddd";
-  const supabaseId = "hkmmkrotpewlzazmgcju";
-  const supabaseUrl = "https://hkmmkrotpewlzazmgcju.supabase.co";
-  const supabaseAnonKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrbW1rcm90cGV3bHphem1nY2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjQ4ODUsImV4cCI6MjA0MzY0MDg4NX0.Q9pmAThZpiaTCNoFEgNHzNFUBPlKZQThevnXpx0d5gc";
-  const vercelToken = "WxEfexDHtSK4TPYqs4xCODyD";
+  const { PROJECT_NAME, supabaseId, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
 
   // 사용자 정보를 가져옵니다.
   const {
@@ -307,7 +300,9 @@ export default async function createEmptyProjectUseCase() {
     }
 
     // 배포된 프로젝트의 URL 반환
-    return deployment.url;
+    const deploymentURL = deployment.url;
+    const projectID = projectRow.id;
+    return { deploymentURL, projectID };
   } catch (error) {
     console.error(error);
     throw error;

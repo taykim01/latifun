@@ -5,7 +5,7 @@ export default async function Page({ params }: { params: { project_id: string } 
 
   return (
     <div className="w-full h-screen">
-      <Components.Whiteboard />
+      <Components.Whiteboard projectID={project_id} />
     </div>
   );
 }

@@ -25,6 +25,7 @@ import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
 import { convertActionsToNodeType } from "@/core/constants/actions";
 import Components from ".";
 import { Button } from "@/presentation/shadcn/button";
+import { useRouter } from "next/navigation";
 
 type NodeUI = {
   id: string;
@@ -54,11 +55,13 @@ export type EdgeData = {
   targetHandle: string | null;
 };
 
-export default function Whiteboard() {
+export default function Whiteboard(props: { projectID: string }) {
   const [nodes, setNodes] = useState<NodeUI[]>([]);
   const [edges, setEdges] = useState<EdgeUI[]>([]);
   const [resultBar, setResultBar] = useState<boolean>(false);
   const lastMoveCallTime = useRef(Date.now());
+
+  const router = useRouter();
 
   const debounce = (func: Function, wait: number) => {
     let timeout: NodeJS.Timeout | null = null;
@@ -73,7 +76,7 @@ export default function Whiteboard() {
   };
 
   const readInitialNodesAndEdges = async () => {
-    const nodes = await readProjectNodesUseCase();
+    const nodes = await readProjectNodesUseCase(props.projectID);
     const newNodes = nodes.map((node: Tables<"node">) => {
       const positions = JSON.parse(node.position as string);
       const UINode: NodeUI = {
@@ -92,7 +95,7 @@ export default function Whiteboard() {
     });
     setNodes(newNodes);
 
-    const edges = await readProjectEdgesUseCase();
+    const edges = await readProjectEdgesUseCase(props.projectID);
     const newEdges = edges.map((edge: Tables<"node">) => {
       const edgeData: EdgeData = JSON.parse(edge.data as string);
       const UIEdge: EdgeUI = {
@@ -248,8 +251,17 @@ export default function Whiteboard() {
       </ReactFlow>
       <Components.ExecuteBar onClick={createNewNode} action={executeAction} />
       <Components.ResultsBar result="hello world" open={resultBar} onClose={() => setResultBar(false)} />
-      <div className="fixed top-8 left-8">
-        <Button onClick={() => setResultBar(!resultBar)}>Show Results</Button>
+      <div className="fixed top-3 left-3 flex flex-col gap-2 p-5 rounded-lg bg-white border border-100 shadow-sm">
+        <Button className="transition-all duration-300" onClick={() => setResultBar(!resultBar)}>
+          Show Results
+        </Button>
+        <Button
+          variant="secondary"
+          className="hover:bg-gray-200 transition-all duration-300"
+          onClick={() => router.push("/")}
+        >
+          Back to Home
+        </Button>
       </div>
     </div>
   );

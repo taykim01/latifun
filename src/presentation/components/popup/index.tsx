@@ -56,8 +56,8 @@ export default function Popup(props: {
           <Icons.X />
         </div>
         <div className="w-full flex flex-col gap-2">
-          <div className="text-title-4 text-gray-900">{props.title}</div>
-          <div className="text-body-14-r text-gray-900">{props.description}</div>
+          <div className="text-xl font-semibold text-gray-900">{props.title}</div>
+          <div className="text-md text-gray-900">{props.description}</div>
         </div>
         <div className="w-full">{props.children}</div>
         {props.buttons && (

@@ -16,14 +16,12 @@ async function readEdgeByProjectID(project_id: string) {
   return data;
 }
 
-export async function readProjectNodesUseCase() {
-  const projectID = "3dc43c94-7103-41fe-b554-a507cc172f39";
+export async function readProjectNodesUseCase(projectID: string) {
   const nodes = await readNodeByProjectID(projectID);
   return nodes;
 }
 
-export async function readProjectEdgesUseCase() {
-  const projectID = "3dc43c94-7103-41fe-b554-a507cc172f39";
+export async function readProjectEdgesUseCase(projectID: string) {
   const edges = await readEdgeByProjectID(projectID);
   return edges;
 }
