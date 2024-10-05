@@ -11,7 +11,7 @@ export default async function Home() {
       const profileData = await readMyProfile(userData.id);
       if (!profileData) redirect("/onboarding");
     } catch (error) {
-      redirect("/onboarding");
+      console.log(error);
     }
   }
 
