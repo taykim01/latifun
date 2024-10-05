@@ -4,7 +4,6 @@
 import { serverClient } from "@/data/infrastructures/supabase/server";
 import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
-import getUserAndProjectID from "@/core/utils/get_project_and_user_id";
 import getUser from "@/data/infrastructures/supabase/get_user";
 
 async function createProfile(profileData: Omit<Tables<"profile">, "id">) {

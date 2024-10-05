@@ -2,10 +2,8 @@
 "use server";
 
 import OpenAI from "openai";
-import { revalidatePath } from "next/cache";
-import { Tables, TablesInsert } from "../dao/database.types";
+import { Tables, TablesInsert, TablesUpdate } from "../dao/database.types";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import llmRepository from "@/data/repositories/llm.repository";
 import { serverClient } from "@/data/infrastructures/supabase/server";
 import { createLLMResponse } from "./generate_application_code.use_case";
 
@@ -16,12 +14,19 @@ interface UseCaseResponse {
 
 export async function createUseCase(useCaseData: TablesInsert<"use_case">) {
   const supabase = serverClient();
-  const { data, error } = await supabase.from("use_case").insert(useCaseData).single();
+  const { data, error } = await supabase.from("use_case").insert(useCaseData).select();
   if (error) throw new Error(error.message);
   return data;
 }
 
-export default async function generateApplicationUseCase(projectID: string) {
+export async function updateUseCase(useCaseData: TablesUpdate<"use_case">, useCaseID: string) {
+  const supabase = serverClient();
+  const { data, error } = await supabase.from("use_case").update(useCaseData).eq("id", useCaseID);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export default async function generateApplicationUseCase(inputJson: string, projectID: string) {
   // export default async function generateApplicationUseCase(nodes: Tables<"node">[]) {
   // 유저가 입력한 node 정보를 조합해서 use case 생성 -> use_case row 저장
   // llm_response에 저장
@@ -29,41 +34,7 @@ export default async function generateApplicationUseCase(projectID: string) {
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const supabase = serverClient();
-  // project_id=projectID인 node들을 가져온다.
-  const { data: allNodes, error } = await supabase.from("node").select("*").eq("project_id", projectID);
-  if (error) throw new Error(error.message);
-  // type = "EDGE" 인 모두 따로 저장
-  const edges = allNodes.filter((node) => node.type === "EDGE");
-  // type = "USER_FLOW_ACTION", "USER_FLOW_PAGE"는 nodes에 남겨둔다. 다른 type 종류 매우 많음, USER_FLOW_ACTION, USER_FLOW_PAGE만 남겨둔다.
-  const nodes = allNodes.filter((node) => node.type === "USER_FLOW_ACTION" || node.type === "USER_FLOW_PAGE");
-
-  // console.log(edges);
-  // console.log(nodes);
-
-  const parsedNodes = nodes.map((node) => ({
-    id: node.id,
-    type: node.type,
-    data: node.data,
-    position: JSON.parse(node.position),
-  }));
-
-  const parsedEdges = edges.map((edge) => {
-    const data = JSON.parse(edge.data);
-    return {
-      id: data.id,
-      type: edge.type,
-      source: data.source,
-      target: data.target,
-    };
-  });
-
-  const combinedNodes = [...parsedNodes, ...parsedEdges];
-
-  const nodesJSON = JSON.stringify(combinedNodes);
-  // console.log(nodesJSON);
-
-  const input: ChatCompletionMessageParam[] = [
+  const messages: ChatCompletionMessageParam[] = [
     {
       role: "system",
       content: [
@@ -78,7 +49,7 @@ export default async function generateApplicationUseCase(projectID: string) {
       content: [
         {
           type: "text",
-          text: nodesJSON,
+          text: inputJson,
         },
       ],
     },
@@ -86,7 +57,7 @@ export default async function generateApplicationUseCase(projectID: string) {
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
-    messages: input,
+    messages: messages,
     max_tokens: 2048,
     response_format: {
       type: "json_schema",
@@ -94,9 +65,9 @@ export default async function generateApplicationUseCase(projectID: string) {
         name: "generated_use_case_text_object",
         schema: {
           type: "object",
-          required: ["use_cases"],
+          required: ["results"],
           properties: {
-            use_cases: {
+            results: {
               type: "array",
               items: {
                 type: "object",
@@ -124,9 +95,10 @@ export default async function generateApplicationUseCase(projectID: string) {
 
   // const useCasesJSON = await llmRepository(input);
 
-  const useCases: UseCaseResponse[] = JSON.parse(useCasesJSON);
+  const useCases: UseCaseResponse[] = JSON.parse(useCasesJSON).results;
 
-  useCases.forEach(async (useCase) => {
+  const newUseCases: Tables<"use_case">[] | any[] = [];
+  for (const useCase of useCases) {
     const useCaseData: TablesInsert<"use_case"> = {
       code_id: null,
       description: useCase.description,
@@ -135,11 +107,13 @@ export default async function generateApplicationUseCase(projectID: string) {
       test_success: false,
       title: useCase.title,
     };
-    await createUseCase(useCaseData);
-  });
+    const newUseCase = await createUseCase(useCaseData);
+    console.log(newUseCase);
+    newUseCases.push(newUseCase[0]);
+  }
 
   const llmData: TablesInsert<"llm_response"> = {
-    input: JSON.stringify(input),
+    input: JSON.stringify(messages),
     origin: "use_case",
     output: useCasesJSON,
     project_id: projectID,
@@ -147,7 +121,5 @@ export default async function generateApplicationUseCase(projectID: string) {
 
   await createLLMResponse(llmData);
 
-  revalidatePath("/project/" + projectID);
+  return newUseCases;
 }
-
-// 태은

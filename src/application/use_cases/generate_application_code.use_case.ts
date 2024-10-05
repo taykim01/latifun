@@ -7,9 +7,9 @@ import { Tables, TablesInsert } from "../dao/database.types";
 import llmRepository from "@/data/repositories/llm.repository";
 import getUserAndProjectID from "@/core/utils/get_project_and_user_id";
 
-async function readUseCase(useCaseID: string) {
+async function readUseCaseByNodeId(nodeId: string) {
   const supabase = serverClient();
-  const { data, error } = await supabase.from("use_case").select("*").eq("id", useCaseID).single();
+  const { data, error } = await supabase.from("use_case").select("*").eq("node_id", nodeId).single();
   if (error) throw new Error(error.message);
   return data;
 }
@@ -33,17 +33,23 @@ interface CodeRespnse {
   code: string;
 }
 
-export default async function generateApplicationCodeUseCase(useCaseID: string) {
+export default async function generateApplicationCodeUseCase(inputJson: string, projectId: string) {
   // use_case row에 있는 정보를 바탕으로 use case 코드 생성 -> code에 저장
   // llm_response에 저장
-  const { projectID } = await getUserAndProjectID();
+  const inputs = JSON.parse(inputJson);
+  // type="USE_CASE"인 경우만 가져오기
+  const useCaseNodes = inputs.filter((node: any) => node.type === "USE_CASE");
 
-  const useCaseData: Tables<"use_case"> = await readUseCase(useCaseID);
+  if (!useCaseNodes.length) return;
 
-  const input: ChatCompletionMessageParam[] = [
-    {
-      role: "system",
-      content: `
+  for (const node of useCaseNodes) {
+    const useCaseData = await readUseCaseByNodeId(node.id);
+    if (!useCaseData) return;
+    console.log(useCaseData);
+    const messages: ChatCompletionMessageParam[] = [
+      {
+        role: "system",
+        content: `
         [role] You are a full-stack senior developer in Next.js who is so good at developing that your code never causes any error.
         You need to write a code for the use case that the user will provide.
         Follow the domain-driven design principles and typescript.
@@ -57,33 +63,32 @@ export default async function generateApplicationCodeUseCase(useCaseID: string) 
         }
         Do NOT any other information in the code.
     `,
-    },
-    { role: "user", content: useCaseData.description },
-  ];
+      },
+      { role: "user", content: useCaseData.description },
+    ];
 
-  const response = await llmRepository(input);
-  const output = JSON.parse(response) as CodeRespnse;
+    const response = await llmRepository(input);
+    const output = JSON.parse(response) as CodeRespnse;
 
-  const code: TablesInsert<"code"> = {
-    content: output.code,
-    extension: ".ts",
-    filepath: "src/application/use_cases/" + useCaseData.title + ".ts",
-    metadata: "",
-    project_id: projectID,
-  };
+    const code: TablesInsert<"code"> = {
+      content: output.code,
+      extension: ".ts",
+      filepath: "src/application/use_cases/" + useCaseData.title + ".ts",
+      metadata: "",
+      project_id: projectID,
+    };
 
-  await createCode(code);
+    await createCode(code);
 
-  const llmData: Tables<"llm_response"> = {
-    created_at: new Date().toISOString(),
-    id: "",
-    input: JSON.stringify(input),
-    origin: "use_case",
-    output: response,
-    project_id: projectID,
-  };
+    const llmData: Tables<"llm_response"> = {
+      created_at: new Date().toISOString(),
+      id: "",
+      input: JSON.stringify(input),
+      origin: "use_case",
+      output: response,
+      project_id: projectID,
+    };
 
-  await createLLMResponse(llmData);
+    await createLLMResponse(llmData);
+  }
 }
-
-// 태은

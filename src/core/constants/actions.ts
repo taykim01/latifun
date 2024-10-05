@@ -13,7 +13,7 @@ export const convertActionsToNodeType = (action: ActionOptions): NodeOptions[] =
   const conversionTable: Record<ActionOptions, NodeOptions[]> = {
     "Generate Use Cases": ["USER_FLOW_PAGE", "USER_FLOW_ACTION"],
     "Generate Schema": ["USER_FLOW_PAGE", "USER_FLOW_ACTION", "USE_CASE"],
-    "Generate Code for Use Cases": ["USE_CASE", "SCHEMA_TABLE"],
+    "Generate Code for Use Cases": ["USER_FLOW_PAGE", "USER_FLOW_ACTION", "USE_CASE", "SCHEMA_TABLE"],
     "Generate Code for UI Components": ["USE_CASE", "SCHEMA_TABLE"],
     "Generate Code for Page UI": ["USE_CASE", "PRESENTATION_COMPONENT", "SCHEMA_TABLE"],
   };
