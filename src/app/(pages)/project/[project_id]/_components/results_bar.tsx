@@ -33,6 +33,7 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
             <Icons.X />
           </div>
         </div>
+        <hr />
         <div className="flex flex-col gap-5 flex-grow">{props.result}</div>
       </div>
     </div>

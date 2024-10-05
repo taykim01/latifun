@@ -59,6 +59,7 @@ export default function Whiteboard(props: { projectID: string }) {
   const [nodes, setNodes] = useState<NodeUI[]>([]);
   const [edges, setEdges] = useState<EdgeUI[]>([]);
   const [resultBar, setResultBar] = useState<boolean>(false);
+  const [helpBar, setHelpBar] = useState<boolean>(false);
   const lastMoveCallTime = useRef(Date.now());
 
   const router = useRouter();
@@ -251,15 +252,28 @@ export default function Whiteboard(props: { projectID: string }) {
       </ReactFlow>
       <Components.ExecuteBar onClick={createNewNode} action={executeAction} />
       <Components.ResultsBar result="hello world" open={resultBar} onClose={() => setResultBar(false)} />
+      <Components.HelpBar open={helpBar} onClose={() => setHelpBar(false)} />
       <div className="fixed top-3 left-3 flex flex-col gap-2 p-5 rounded-lg bg-white border border-100 shadow-sm">
-        <Button className="transition-all duration-300" onClick={() => setResultBar(!resultBar)}>
+        <Button
+          className="transition-all duration-300"
+          onClick={() => {
+            setResultBar(!resultBar);
+            setHelpBar(false);
+          }}
+        >
           Show Results
         </Button>
         <Button
           variant="secondary"
-          className="hover:bg-gray-200 transition-all duration-300"
-          onClick={() => router.push("/")}
+          className="transition-all duration-300 hover:bg-gray-200 "
+          onClick={() => {
+            setHelpBar(!helpBar);
+            setResultBar(false);
+          }}
         >
+          Need Help?
+        </Button>
+        <Button variant="outline" className="transition-all duration-300" onClick={() => router.push("/")}>
           Back to Home
         </Button>
       </div>
