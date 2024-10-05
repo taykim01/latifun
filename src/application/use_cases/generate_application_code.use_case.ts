@@ -3,7 +3,7 @@
 
 import { serverClient } from "@/data/infrastructures/supabase/server";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
-import { Tables } from "../dao/database.types";
+import { Tables, TablesInsert } from "../dao/database.types";
 import llmRepository from "@/data/repositories/llm.repository";
 import getUserAndProjectID from "@/core/utils/get_project_and_user_id";
 
@@ -14,14 +14,14 @@ async function readUseCase(useCaseID: string) {
   return data;
 }
 
-export async function createLLMResponse(llmData: Tables<"llm_response">) {
+export async function createLLMResponse(llmData: TablesInsert<"llm_response">) {
   const supabase = serverClient();
   const { data, error } = await supabase.from("llm_response").insert(llmData).single();
   if (error) throw new Error(error.message);
   return data;
 }
 
-export async function createCode(codeData: Tables<"code">) {
+export async function createCode(codeData: TablesInsert<"code">) {
   const supabase = serverClient();
   const { data, error } = await supabase.from("code").insert(codeData).single();
   if (error) throw new Error(error.message);
@@ -64,12 +64,10 @@ export default async function generateApplicationCodeUseCase(useCaseID: string) 
   const response = await llmRepository(input);
   const output = JSON.parse(response) as CodeRespnse;
 
-  const code: Tables<"code"> = {
+  const code: TablesInsert<"code"> = {
     content: output.code,
-    created_at: new Date().toISOString(),
     extension: ".ts",
     filepath: "src/application/use_cases/" + useCaseData.title + ".ts",
-    id: "",
     metadata: "",
     project_id: projectID,
   };

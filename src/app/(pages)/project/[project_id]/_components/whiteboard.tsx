@@ -22,6 +22,8 @@ import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/
 import { Tables } from "@/application/dao/database.types";
 import { moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
 import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
+import { Button } from "@/presentation/shadcn/button";
+import generateApplicationUseCase from "@/application/use_cases/generate_application.use_case";
 
 type NodeUI = {
   id: string;
@@ -119,9 +121,14 @@ export default function Whiteboard() {
   );
 
   const onNodesChange = useCallback(async (changes: NodeChange<NodeUI>[]) => {
+    const newNodes: any[] = [];
     setNodes((nds) => {
-      return applyNodeChanges(changes, nds);
+      const newNode = applyNodeChanges(changes, nds);
+      newNodes.push(newNode);
+      // return applyNodeChanges(changes, nds);
+      return newNode;
     });
+    console.log(JSON.stringify(newNodes));
     const nodeChange = changes[0] as any;
     if (!nodeChange.position) return;
     const changedNode = { x: nodeChange.position.x, y: nodeChange.position.y };
@@ -214,6 +221,12 @@ export default function Whiteboard() {
         <Controls />
       </ReactFlow>
       <ExecuteBar onClick={createNewNode} />
+      <Button
+        className="absolute bottom-4 right-4"
+        onClick={() => generateApplicationUseCase("3dc43c94-7103-41fe-b554-a507cc172f39")}
+      >
+        Generate Use case
+      </Button>
     </div>
   );
 }
