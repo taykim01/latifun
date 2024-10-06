@@ -312,7 +312,11 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
         <Controls />
       </ReactFlow>
       <Components.ExecuteBar onClick={createEmptyNode} action={executeAction} />
-      <Components.ResultsBar result="hello world" open={resultBar} onClose={() => setResultBar(false)} />
+      <Components.ResultsBar
+        result={nodes[nodes.length - 1]?.data.defaultText}
+        open={resultBar}
+        onClose={() => setResultBar(false)}
+      />
       <Components.HelpBar open={helpBar} onClose={() => setHelpBar(false)} />
       <div className="fixed top-3 left-3 flex flex-col gap-2 p-5 rounded-lg bg-white border border-100 shadow-sm">
         <Button
@@ -322,7 +326,7 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
             setHelpBar(false);
           }}
         >
-          Show Results
+          Recent Result
         </Button>
         <Button
           variant="secondary"

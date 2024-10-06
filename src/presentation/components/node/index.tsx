@@ -4,13 +4,13 @@ import { Handle, Position } from "@xyflow/react";
 import { ChangeEvent } from "react";
 
 export const NODE_TYPE = [
+  "IDEA",
   "USER_FLOW_PAGE",
   "USER_FLOW_ACTION",
   "USE_CASE",
   "SCHEMA_TABLE",
   "PRESENTATION_PAGE",
   "PRESENTATION_COMPONENT",
-  "IDEA",
   "EDGE",
 ] as const;
 

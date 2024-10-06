@@ -35,7 +35,7 @@ function UI(props: {
   return (
     <div className="w-full h-full flex" style={{ backgroundColor: "#fdfdfd" }}>
       <aside className="min-w-[200px] h-screen shadow hover:shadow-lg transition-all duration-300 px-8 pt-12 pb-6 flex flex-col justify-between">
-        <Components.ProfileGroup />
+        <Components.ProfileGroup userName={props.userName} />
         <Components.LogOutButton />
       </aside>
       <div className="w-full px-16 py-12 flex flex-col gap-8">
@@ -49,7 +49,7 @@ function UI(props: {
             <div className="text-xl font-semibold">My Projects</div>
             <Components.CreateProjectButton />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 w-full">
+          <div className="flex flex-wrap gap-5 w-full">
             {props.myProjects?.map((project, index) => (
               <Card
                 key={index}

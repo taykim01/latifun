@@ -14,14 +14,16 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
     }
   }, [props.open]);
 
+  const result = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
+
   return (
     <div
       className={`
         fixed top-5 bottom-5
-        bg-white max-w-[360px] w-full
+        bg-white max-w-[40vw] w-full
         flex flex-col items-center gap-10
         transition-all duration-1000 ease-in-out
-        ${isVisible ? "right-5" : "-right-[360px]"}
+        ${isVisible ? "right-5" : "-right-[40vw]"}
         rounded-xl border border-100
       `}
       onClick={(e) => e.stopPropagation()}
@@ -34,7 +36,21 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
           </div>
         </div>
         <hr />
-        <div className="flex flex-col gap-5 flex-grow">{props.result}</div>
+        <div className="flex flex-col gap-5 flex-grow break-words overflow-scroll rounded-md">
+          <pre
+            style={{
+              whiteSpace: "break-spaces",
+              backgroundColor: "#282C34",
+              color: "#ABB2BF",
+              fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+              fontSize: "12px",
+              lineHeight: "1.5",
+            }}
+            className="p-4"
+          >
+            {result?.code ? result.code : JSON.stringify(result, null, 2)}
+          </pre>
+        </div>
       </div>
     </div>
   );

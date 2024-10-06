@@ -45,7 +45,7 @@ export default function Popup(props: {
       <div
         className={`
                     fixed left-1/2 transform -translate-x-1/2
-                    bg-white w-[360px] p-8 rounded-lg
+                    bg-white w-[400px] p-8 rounded-lg
                     flex flex-col items-center gap-10
                     transition-all duration-1000 ease-in-out
                     ${isVisible ? "bottom-1/2 translate-y-1/2" : "bottom-0 translate-y-full"}
