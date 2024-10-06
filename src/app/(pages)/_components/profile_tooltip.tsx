@@ -1,5 +1,3 @@
-"use client";
-
 export default function ProfileTooltip() {
   return (
     <div className="absolute top-10 w-full rounded-lg bg-gray-white flex flex-col text-body-regular text-gray-800 shadow-lg">

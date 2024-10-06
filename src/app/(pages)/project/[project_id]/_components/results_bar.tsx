@@ -3,8 +3,28 @@
 import Icons from "@/presentation/components/icons";
 import { useState, useEffect } from "react";
 
-export default function ResultsBar(props: { result: string; open: boolean; onClose: () => void }) {
+export default function ResultsBar(props: {
+  result: string;
+  open: boolean;
+  onClose: () => void;
+  onChange: (value: string) => void;
+}) {
   const [isVisible, setIsVisible] = useState(false);
+
+  let isResultJson = false;
+  try {
+    JSON.parse(props.result);
+    isResultJson = true;
+  } catch (error) {
+    isResultJson = false;
+  }
+  const result = isResultJson ? JSON.parse(props.result) : props.result;
+  const [text, setText] = useState(result?.code ? result.code : JSON.stringify(props.result, null, 2));
+
+  const handleChangeText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    props.onChange(e.target.value);
+  };
 
   useEffect(() => {
     if (props.open) {
@@ -18,10 +38,10 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
     <div
       className={`
         fixed top-5 bottom-5
-        bg-white max-w-[360px] w-full
+        bg-white max-w-[40vw] w-full
         flex flex-col items-center gap-10
         transition-all duration-1000 ease-in-out
-        ${isVisible ? "right-5" : "-right-[360px]"}
+        ${isVisible ? "right-5" : "-right-[40vw]"}
         rounded-xl border border-100
       `}
       onClick={(e) => e.stopPropagation()}
@@ -34,7 +54,21 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
           </div>
         </div>
         <hr />
-        <div className="flex flex-col gap-5 flex-grow">{props.result}</div>
+        <div className="flex flex-col gap-5 flex-grow break-words overflow-scroll rounded-md h-full">
+          <textarea
+            style={{
+              backgroundColor: "#282C34",
+              color: "#ABB2BF",
+              fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+              fontSize: "12px",
+              lineHeight: "1.5",
+              overflowWrap: "break-word",
+            }}
+            className="flex-grow resize-none rounded-md whitespace-pre-wrap overflow-scroll w-full border-none p-4"
+            value={text}
+            onChange={handleChangeText}
+          />
+        </div>
       </div>
     </div>
   );

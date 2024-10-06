@@ -2,7 +2,6 @@
 
 import { NODE_TYPE, NodeOptions } from "@/presentation/components/node";
 import { Button } from "@/presentation/shadcn/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/presentation/shadcn/select";
 import React from "react";
 import { useState } from "react";
 import Components from ".";

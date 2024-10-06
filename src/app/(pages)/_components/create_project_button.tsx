@@ -9,6 +9,7 @@ import { Label } from "@/presentation/shadcn/label";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Components from ".";
+import { Button as ShadcnButton } from "@/presentation/shadcn/button";
 
 export default function CreateProjectButton() {
   const [popup, setPopup] = useState(false);
@@ -27,6 +28,16 @@ export default function CreateProjectButton() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const inputTesterAccount = () => {
+    setForm({
+      ...form,
+      supabaseId: process.env.NEXT_PUBLIC_TESTER_SUPABASE_ID!,
+      supabaseUrl: process.env.NEXT_PUBLIC_TESTER_SUPABASE_URL!,
+      supabaseAnonKey: process.env.NEXT_PUBLIC_TESTER_SUPABASE_ANON_KEY!,
+      vercelToken: process.env.NEXT_PUBLIC_TESTER_VERCEL_TOKEN!,
+    });
   };
 
   return (
@@ -53,11 +64,18 @@ export default function CreateProjectButton() {
             return (
               <div key={index} className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="picture">{convertFormKeys(key as keyof typeof emptyForm)}</Label>
-                <Input type={type} onChange={(e) => setForm({ ...form, [key]: e.target.value })} />
+                <Input
+                  type={type}
+                  value={form[key as keyof typeof emptyForm]}
+                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                />
               </div>
             );
           })}
         </div>
+        <ShadcnButton className="w-full mt-7" onClick={inputTesterAccount}>
+          Use Tester Account
+        </ShadcnButton>
       </Popup>
       {loading && <Components.CreateProjectLoader />}
     </>
