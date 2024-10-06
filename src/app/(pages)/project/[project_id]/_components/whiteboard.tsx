@@ -37,6 +37,8 @@ import { useRouter } from "next/navigation";
 import generatePresentationPageSpecUseCase from "@/application/use_cases/generate_presentation_page_spec.use_case";
 import generatePresentationComponentSpecUseCase from "@/application/use_cases/generate_presentation_component_spec.use_case";
 import generatePresenationComponentCodeUseCase from "@/application/use_cases/generate_presentation_component_code.use_case";
+import generatePresenationPageCodeUseCase from "@/application/use_cases/generate_presentation_page_code.use_case";
+import deployProjectUseCase from "@/application/use_cases/deploy_project.use_case";
 
 type NodeUI = {
   id: string;
@@ -405,7 +407,7 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
           }))
         );
 
-        const output = await generatePresenationComponentCodeUseCase(
+        const output = await generatePresenationPageCodeUseCase(
           pageSpecNodeJson,
           componentCodeNodesJson,
           useCaseCodeNodesJson,
@@ -415,6 +417,9 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
         const data = JSON.stringify(output);
         createNewNode("PRESENTATION_COMPONENT", data);
       }
+    } else if (action === ACTIONS[6]) {
+      // "Deploy to Server"
+      await deployProjectUseCase(projectId);
     }
   };
 

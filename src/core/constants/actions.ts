@@ -8,6 +8,7 @@ export const ACTIONS = [
   "Generate Page Spec",
   "Generate Code for UI Components",
   "Generate Code for Page UI",
+  "Deploy to Server",
 ] as const;
 
 export const convertActionsToNodeType = (action: ActionOptions): NodeOptions[] => {
@@ -18,6 +19,7 @@ export const convertActionsToNodeType = (action: ActionOptions): NodeOptions[] =
     "Generate Page Spec": ["USER_FLOW_PAGE", "USER_FLOW_ACTION", "USE_CASE", "USE_CASE_CODE"],
     "Generate Code for UI Components": ["SCHEMA_TABLE", "PRESENTATION_COMPONENT_SPEC", "PRESENTATION_PAGE_SPEC"],
     "Generate Code for Page UI": ["USE_CASE", "PRESENTATION_COMPONENT", "SCHEMA_TABLE"],
+    "Deploy to Server": [],
   };
 
   return conversionTable[action];

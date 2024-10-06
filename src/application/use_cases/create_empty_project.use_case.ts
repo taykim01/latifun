@@ -14,6 +14,8 @@ export interface FormValues {
   supabaseUrl: string;
   supabaseAnonKey: string;
   vercelToken: string;
+  supabaseToken: string;
+  supabaseDBPassword: string;
 }
 
 interface VercelAPIError {
@@ -55,18 +57,19 @@ interface UploadedFile {
   sha: string;
 }
 
-export default async function createEmptyProjectUseCase() {
-  // Supabase client
-  const supabase = serverClient();
+// export default async function createEmptyProjectUseCase() {
+//   // Supabase client
+//   const supabase = serverClient();
 
-  const PROJECT_NAME = "next14_shadcn_ddd";
-  const supabaseToken = "sbp_58cb12b580e68edd51f01360747e09999b8ca673";
-  const supabaseDBPassword = "supabase";
-  const vercelToken = "WxEfexDHtSK4TPYqs4xCODyD";
-  // export default async function createEmptyProjectUseCase(formData: FormValues) {
-  //   // Supabase 클라이언트를 생성합니다.
-  //   const supabase = serverClient();
-  //   const { PROJECT_NAME, supabaseId, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
+//   const PROJECT_NAME = "next14_shadcn_ddd";
+//   const supabaseToken = "sbp_58cb12b580e68edd51f01360747e09999b8ca673";
+//   const supabaseDBPassword = "supabase";
+//   const vercelToken = "WxEfexDHtSK4TPYqs4xCODyD";
+export default async function createEmptyProjectUseCase(formData: FormValues) {
+  // Supabase 클라이언트를 생성합니다.
+  const supabase = serverClient();
+  const { PROJECT_NAME, supabaseId, supabaseUrl, supabaseAnonKey, vercelToken, supabaseToken, supabaseDBPassword } =
+    formData;
 
   // Get authenticated user
   const {
