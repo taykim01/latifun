@@ -21,6 +21,10 @@ export default function ResultsBar(props: {
   const result = isResultJson ? JSON.parse(props.result) : props.result;
   const [text, setText] = useState(result?.code ? result.code : JSON.stringify(props.result, null, 2));
 
+  useEffect(() => {
+    setText(result?.code ? result.code : JSON.stringify(props.result, null, 2));
+  }, [result]);
+
   const handleChangeText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
     props.onChange(e.target.value);
