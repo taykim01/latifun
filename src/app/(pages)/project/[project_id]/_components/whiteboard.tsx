@@ -24,7 +24,7 @@ import {
 } from "@/application/use_cases/create_empty_node.use_case";
 import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/use_cases/read_my_nodes.use_case";
 import { Tables } from "@/application/dao/database.types";
-import { moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
+import { modifyNodeDataUseCase, moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
 import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
 import { ACTIONS, convertActionsToNodeType } from "@/core/constants/actions";
 import Components from ".";
@@ -316,6 +316,23 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
         result={nodes[nodes.length - 1]?.data.defaultText}
         open={resultBar}
         onClose={() => setResultBar(false)}
+        onChange={async (value: string) => {
+          const lastNode = nodes[nodes.length - 1];
+          const newNodes = nodes.map((node) => {
+            if (node.id === lastNode.id) {
+              return {
+                ...node,
+                data: {
+                  defaultLabel: lastNode.data.defaultLabel,
+                  defaultText: value,
+                },
+              };
+            }
+            return node;
+          });
+          setNodes(newNodes);
+          await modifyNodeDataUseCase(lastNode.id, value);
+        }}
       />
       <Components.HelpBar open={helpBar} onClose={() => setHelpBar(false)} />
       <div className="fixed top-3 left-3 flex flex-col gap-2 p-5 rounded-lg bg-white border border-100 shadow-sm">

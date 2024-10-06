@@ -3,8 +3,28 @@
 import Icons from "@/presentation/components/icons";
 import { useState, useEffect } from "react";
 
-export default function ResultsBar(props: { result: string; open: boolean; onClose: () => void }) {
+export default function ResultsBar(props: {
+  result: string;
+  open: boolean;
+  onClose: () => void;
+  onChange: (value: string) => void;
+}) {
   const [isVisible, setIsVisible] = useState(false);
+
+  let isResultJson = false;
+  try {
+    JSON.parse(props.result);
+    isResultJson = true;
+  } catch (error) {
+    isResultJson = false;
+  }
+  const result = isResultJson ? JSON.parse(props.result) : props.result;
+  const [text, setText] = useState(result?.code ? result.code : JSON.stringify(props.result, null, 2));
+
+  const handleChangeText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    props.onChange(e.target.value);
+  };
 
   useEffect(() => {
     if (props.open) {
@@ -13,8 +33,6 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
       setIsVisible(false);
     }
   }, [props.open]);
-
-  const result = typeof props.result === "string" ? JSON.parse(props.result) : props.result;
 
   return (
     <div
@@ -36,20 +54,20 @@ export default function ResultsBar(props: { result: string; open: boolean; onClo
           </div>
         </div>
         <hr />
-        <div className="flex flex-col gap-5 flex-grow break-words overflow-scroll rounded-md">
-          <pre
+        <div className="flex flex-col gap-5 flex-grow break-words overflow-scroll rounded-md h-full">
+          <textarea
             style={{
-              whiteSpace: "break-spaces",
               backgroundColor: "#282C34",
               color: "#ABB2BF",
               fontFamily: 'Menlo, Monaco, "Courier New", monospace',
               fontSize: "12px",
               lineHeight: "1.5",
+              overflowWrap: "break-word",
             }}
-            className="p-4"
-          >
-            {result?.code ? result.code : JSON.stringify(result, null, 2)}
-          </pre>
+            className="flex-grow resize-none rounded-md whitespace-pre-wrap overflow-scroll w-full border-none p-4"
+            value={text}
+            onChange={handleChangeText}
+          />
         </div>
       </div>
     </div>
