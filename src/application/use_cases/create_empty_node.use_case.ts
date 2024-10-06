@@ -44,6 +44,12 @@ export async function createNodeUseCase({
   return nodeID;
 }
 
+export async function updateNodeUseCase({ id, data }: { id: string; data: string }) {
+  const supabase = serverClient();
+  const { error } = await supabase.from("node").update({ data }).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 export async function createEdgeNodeUseCase(edgeData: EdgeData & { id: string }) {
   const newNode: Omit<Tables<"node">, "id" | "created_at"> = {
     data: JSON.stringify(edgeData),

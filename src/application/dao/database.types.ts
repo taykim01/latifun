@@ -19,7 +19,7 @@ export type Database = {
           latest: boolean
           metadata: Json
           project_id: string
-          sha1sum: string
+          sha1sum: string | null
         }
         Insert: {
           content: string
@@ -27,10 +27,10 @@ export type Database = {
           extension: string
           filepath: string
           id?: string
-          latest: boolean
+          latest?: boolean
           metadata?: Json
           project_id: string
-          sha1sum: string
+          sha1sum?: string | null
         }
         Update: {
           content?: string
@@ -41,7 +41,7 @@ export type Database = {
           latest?: boolean
           metadata?: Json
           project_id?: string
-          sha1sum?: string
+          sha1sum?: string | null
         }
         Relationships: [
           {
@@ -320,6 +320,7 @@ export type Database = {
         | "IDEA"
         | "EDGE"
         | "GROUP"
+        | "USE_CASE_CODE"
     }
     CompositeTypes: {
       [_ in never]: never
