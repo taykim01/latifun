@@ -17,14 +17,21 @@ import {
 import "@xyflow/react/dist/style.css";
 import ExecuteBar, { ActionOptions } from "./execute_bar";
 import Node, { NodeOptions } from "@/presentation/components/node";
-import { createEdgeNodeUseCase, createEmptyNodeUseCase } from "@/application/use_cases/create_empty_node.use_case";
+import {
+  createEdgeNodeUseCase,
+  createEmptyNodeUseCase,
+  createNodeUseCase,
+} from "@/application/use_cases/create_empty_node.use_case";
 import { readProjectEdgesUseCase, readProjectNodesUseCase } from "@/application/use_cases/read_my_nodes.use_case";
 import { Tables } from "@/application/dao/database.types";
 import { moveNodeUseCase } from "@/application/use_cases/modify_node.use_case";
 import deleteNodeUseCase from "@/application/use_cases/delete_node.use_case";
-import { convertActionsToNodeType } from "@/core/constants/actions";
+import { ACTIONS, convertActionsToNodeType } from "@/core/constants/actions";
 import Components from ".";
 import { Button } from "@/presentation/shadcn/button";
+import generateApplicationUseCase, { updateUseCase } from "@/application/use_cases/generate_application.use_case";
+import generateSchemaCodeUseCase from "@/application/use_cases/generate_schema_code.use_case";
+import generateApplicationCodeUseCase from "@/application/use_cases/generate_application_code.use_case";
 import { useRouter } from "next/navigation";
 
 type NodeUI = {
@@ -55,7 +62,7 @@ export type EdgeData = {
   targetHandle: string | null;
 };
 
-export default function Whiteboard(props: { projectID: string }) {
+export default function Whiteboard({ projectId }: { projectId: string }) {
   const [nodes, setNodes] = useState<NodeUI[]>([]);
   const [edges, setEdges] = useState<EdgeUI[]>([]);
   const [resultBar, setResultBar] = useState<boolean>(false);
@@ -77,7 +84,7 @@ export default function Whiteboard(props: { projectID: string }) {
   };
 
   const readInitialNodesAndEdges = async () => {
-    const nodes = await readProjectNodesUseCase(props.projectID);
+    const nodes = await readProjectNodesUseCase(projectId);
     const newNodes = nodes.map((node: Tables<"node">) => {
       const positions = JSON.parse(node.position as string);
       const UINode: NodeUI = {
@@ -96,7 +103,7 @@ export default function Whiteboard(props: { projectID: string }) {
     });
     setNodes(newNodes);
 
-    const edges = await readProjectEdgesUseCase(props.projectID);
+    const edges = await readProjectEdgesUseCase(projectId);
     const newEdges = edges.map((edge: Tables<"node">) => {
       const edgeData: EdgeData = JSON.parse(edge.data as string);
       const UIEdge: EdgeUI = {
@@ -127,9 +134,14 @@ export default function Whiteboard(props: { projectID: string }) {
   );
 
   const onNodesChange = useCallback(async (changes: NodeChange<NodeUI>[]) => {
+    const newNodes: any[] = [];
     setNodes((nds) => {
-      return applyNodeChanges(changes, nds);
+      const newNode = applyNodeChanges(changes, nds);
+      newNodes.push(newNode);
+      // return applyNodeChanges(changes, nds);
+      return newNode;
     });
+    console.log(JSON.stringify(newNodes));
     const nodeChange = changes[0] as any;
     if (!nodeChange.position) return;
     const changedNode = { x: nodeChange.position.x, y: nodeChange.position.y };
@@ -167,8 +179,8 @@ export default function Whiteboard(props: { projectID: string }) {
     []
   );
 
-  const createNewNode = useCallback(async (type: NodeOptions) => {
-    const nodeID = await createEmptyNodeUseCase({ type: type });
+  const createEmptyNode = useCallback(async (type: NodeOptions) => {
+    const nodeID = await createEmptyNodeUseCase({ type, projectId });
 
     const newNode = {
       id: nodeID,
@@ -178,6 +190,20 @@ export default function Whiteboard(props: { projectID: string }) {
     };
 
     setNodes((nds) => [...nds, newNode]);
+  }, []);
+
+  const createNewNode = useCallback(async (type: NodeOptions, data: string) => {
+    const nodeID = await createNodeUseCase({ type, projectId, data });
+
+    const newNode = {
+      id: nodeID,
+      data: { defaultLabel: type, defaultText: data },
+      position: { x: 0, y: 0 }, // TODO: set position based on the last node
+      type: type,
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+    return nodeID;
   }, []);
 
   const onNodesDelete = useCallback(
@@ -228,10 +254,45 @@ export default function Whiteboard(props: { projectID: string }) {
       });
     });
     const minimizedEdges = relatedEdges.map((edge) => {
-      return "from " + edge.source + " to " + edge.target;
+      return {
+        id: "from " + edge.source + " to " + edge.target,
+        type: "EDGE",
+      };
     });
 
-    console.log(minimizedNodes, minimizedEdges);
+    const inputs = [...minimizedNodes, ...minimizedEdges];
+    const inputJson = JSON.stringify(inputs);
+
+    if (action === ACTIONS[0]) {
+      const useCases = await generateApplicationUseCase(inputJson, projectId);
+      for (const useCase of useCases) {
+        const data = {
+          title: useCase.title,
+          description: useCase.description,
+        };
+        const stringifiedData = JSON.stringify(data);
+        const nodeId = await createNewNode("USE_CASE", stringifiedData);
+        const updatedUseCase = await updateUseCase(
+          {
+            node_id: nodeId,
+          },
+          useCase.id
+        );
+      }
+    } else if (action === ACTIONS[1]) {
+      const outputs = await generateSchemaCodeUseCase(inputJson, projectId);
+      outputs.forEach((output: any) => {
+        const data = JSON.stringify(output);
+        createNewNode("SCHEMA_TABLE", data);
+      });
+    } else if (action === ACTIONS[2]) {
+      console.log(inputJson);
+      // const outputs = await generateApplicationCodeUseCase(inputJson, projectId);
+      // outputs.forEach((output: any) => {
+      //   const data = JSON.stringify(output);
+      //   createNewNode("SCHEMA_TABLE", data);
+      // });
+    }
   };
 
   return (
@@ -250,7 +311,7 @@ export default function Whiteboard(props: { projectID: string }) {
         <Background />
         <Controls />
       </ReactFlow>
-      <Components.ExecuteBar onClick={createNewNode} action={executeAction} />
+      <Components.ExecuteBar onClick={createEmptyNode} action={executeAction} />
       <Components.ResultsBar result="hello world" open={resultBar} onClose={() => setResultBar(false)} />
       <Components.HelpBar open={helpBar} onClose={() => setHelpBar(false)} />
       <div className="fixed top-3 left-3 flex flex-col gap-2 p-5 rounded-lg bg-white border border-100 shadow-sm">
