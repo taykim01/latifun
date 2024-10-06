@@ -35,6 +35,7 @@ import generateSchemaCodeUseCase from "@/application/use_cases/generate_schema_c
 import generateApplicationCodeUseCase from "@/application/use_cases/generate_application_code.use_case";
 import { useRouter } from "next/navigation";
 import generatePresentationPageSpecUseCase from "@/application/use_cases/generate_presentation_page_spec.use_case";
+import generatePresentationComponentSpecUseCase from "@/application/use_cases/generate_presentation_component_spec.use_case";
 
 type NodeUI = {
   id: string;
@@ -298,13 +299,16 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
         createNewNode("USE_CASE_CODE", data);
       });
     } else if (action === ACTIONS[3]) {
-      console.log(inputJson);
       const outputs = await generatePresentationPageSpecUseCase(inputJson, projectId);
-      outputs.forEach((output) => {
-        // TODO: 실제로 관련되 USE_CASE 노드와 엣지로 연결하기
+      for (const output of outputs) {
         const data = JSON.stringify(output);
         createNewNode("PRESENTATION_PAGE_SPEC", data);
-      });
+        const componentsSpecs = await generatePresentationComponentSpecUseCase(data, inputJson, projectId);
+        for (const componentSpec of componentsSpecs) {
+          const componentData = JSON.stringify(componentSpec);
+          createNewNode("PRESENTATION_COMPONENT_SPEC", componentData);
+        }
+      }
     }
   };
 
