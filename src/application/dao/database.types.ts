@@ -321,6 +321,8 @@ export type Database = {
         | "EDGE"
         | "GROUP"
         | "USE_CASE_CODE"
+        | "PRESENTATION_PAGE_SPEC"
+        | "PRESENTATION_COMPONENT_SPEC"
     }
     CompositeTypes: {
       [_ in never]: never
