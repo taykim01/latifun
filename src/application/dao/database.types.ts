@@ -188,44 +188,44 @@ export type Database = {
         Row: {
           created_at: string
           custom_domain: string | null
-          domain: string
+          domain: string | null
           id: string
           profile_id: string | null
-          supabase_anon_key: string
-          supabase_api_key: string
+          supabase_anon_key: string | null
+          supabase_api_key: string | null
           supabase_db_password: string | null
           supabase_ref: string | null
-          supabase_url: string
-          title: string
-          vercel_api_key: string
+          supabase_url: string | null
+          title: string | null
+          vercel_api_key: string | null
         }
         Insert: {
           created_at?: string
           custom_domain?: string | null
-          domain: string
+          domain?: string | null
           id?: string
           profile_id?: string | null
-          supabase_anon_key: string
-          supabase_api_key: string
+          supabase_anon_key?: string | null
+          supabase_api_key?: string | null
           supabase_db_password?: string | null
           supabase_ref?: string | null
-          supabase_url: string
-          title: string
-          vercel_api_key: string
+          supabase_url?: string | null
+          title?: string | null
+          vercel_api_key?: string | null
         }
         Update: {
           created_at?: string
           custom_domain?: string | null
-          domain?: string
+          domain?: string | null
           id?: string
           profile_id?: string | null
-          supabase_anon_key?: string
-          supabase_api_key?: string
+          supabase_anon_key?: string | null
+          supabase_api_key?: string | null
           supabase_db_password?: string | null
           supabase_ref?: string | null
-          supabase_url?: string
-          title?: string
-          vercel_api_key?: string
+          supabase_url?: string | null
+          title?: string | null
+          vercel_api_key?: string | null
         }
         Relationships: [
           {

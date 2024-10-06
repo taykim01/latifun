@@ -10,9 +10,9 @@ import { Next14ShadcnDDD } from "@/core/files/type1/next14_shadcn_ddd";
 
 export interface FormValues {
   PROJECT_NAME: string;
-  supabaseId: string;
-  supabaseUrl: string;
-  supabaseAnonKey: string;
+  // supabaseId: string;
+  // supabaseUrl: string;
+  // supabaseAnonKey: string;
   vercelToken: string;
   supabaseToken: string;
   supabaseDBPassword: string;
@@ -68,8 +68,7 @@ interface UploadedFile {
 export default async function createEmptyProjectUseCase(formData: FormValues) {
   // Supabase 클라이언트를 생성합니다.
   const supabase = serverClient();
-  const { PROJECT_NAME, supabaseId, supabaseUrl, supabaseAnonKey, vercelToken, supabaseToken, supabaseDBPassword } =
-    formData;
+  const { PROJECT_NAME, vercelToken, supabaseToken, supabaseDBPassword } = formData;
 
   // Get authenticated user
   const {
@@ -120,7 +119,7 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
         .eq("title", PROJECT_NAME)
         .single();
 
-      if (getProjectError || !existingProject) {
+      if (getProjectError) {
         throw new Error("Error fetching project information from database.");
       }
 
@@ -242,9 +241,9 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
           }),
         });
 
-        if (!createSupabaseProjectResponse.ok) {
-          throw new Error(`Error creating Supabase project: ${createSupabaseProjectResponse.statusText}`);
-        }
+        // if (!createSupabaseProjectResponse.ok) {
+        //   throw new Error(`Error creating Supabase project: ${createSupabaseProjectResponse.statusText}`);
+        // }
 
         supabaseProject = (await createSupabaseProjectResponse.json()) as SupabaseProject;
         console.log(`Supabase project created: ${supabaseProject.name}`);

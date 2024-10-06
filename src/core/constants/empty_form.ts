@@ -2,19 +2,23 @@ import { FormValues } from "@/application/use_cases/create_empty_project.use_cas
 
 export const emptyForm: FormValues = {
   PROJECT_NAME: "",
-  supabaseId: "",
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  // supabaseId: "",
+  // supabaseUrl: "",
+  // supabaseAnonKey: "",
   vercelToken: "",
+  supabaseToken: "",
+  supabaseDBPassword: "",
 } as const;
 
 export const convertFormKeys = (form: keyof typeof emptyForm) => {
   const conversionTable: Record<keyof typeof emptyForm, string> = {
     PROJECT_NAME: "Project Name",
-    supabaseId: "Supabase ID",
-    supabaseUrl: "Supabase URL",
-    supabaseAnonKey: "Supabase Anon Key",
+    // supabaseId: "Supabase ID",
+    // supabaseUrl: "Supabase URL",
+    // supabaseAnonKey: "Supabase Anon Key",
     vercelToken: "Vercel Token",
+    supabaseToken: "Supabase Token",
+    supabaseDBPassword: "Supabase DB Password",
   };
 
   return conversionTable[form];
