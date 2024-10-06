@@ -33,10 +33,10 @@ export default function CreateProjectButton() {
   const inputTesterAccount = () => {
     setForm({
       ...form,
-      supabaseId: process.env.NEXT_PUBLIC_SUPABASE_ID!,
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      vercelToken: process.env.NEXT_PUBLIC_VERCEL_TOKEN!,
+      supabaseId: process.env.NEXT_PUBLIC_TESTER_SUPABASE_ID!,
+      supabaseUrl: process.env.NEXT_PUBLIC_TESTER_SUPABASE_URL!,
+      supabaseAnonKey: process.env.NEXT_PUBLIC_TESTER_SUPABASE_ANON_KEY!,
+      vercelToken: process.env.NEXT_PUBLIC_TESTER_VERCEL_TOKEN!,
     });
   };
 
