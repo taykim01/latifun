@@ -8,6 +8,14 @@ import TABLES from "@/data/infrastructures/supabase/tables";
 import { Tables } from "../dao/database.types";
 import { Next14ShadcnDDD } from "@/core/files/type1/next14_shadcn_ddd";
 
+export interface FormValues {
+  PROJECT_NAME: string;
+  supabaseId: string;
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  vercelToken: string;
+}
+
 interface VercelAPIError {
   error: {
     code: string;
@@ -55,6 +63,10 @@ export default async function createEmptyProjectUseCase() {
   const supabaseToken = "sbp_58cb12b580e68edd51f01360747e09999b8ca673";
   const supabaseDBPassword = "supabase";
   const vercelToken = "WxEfexDHtSK4TPYqs4xCODyD";
+// export default async function createEmptyProjectUseCase(formData: FormValues) {
+//   // Supabase 클라이언트를 생성합니다.
+//   const supabase = serverClient();
+//   const { PROJECT_NAME, supabaseId, supabaseUrl, supabaseAnonKey, vercelToken } = formData;
 
   // Get authenticated user
   const {
@@ -393,8 +405,15 @@ export default async function createEmptyProjectUseCase() {
       throw new Error(`Error saving deployment information to database: ${deploymentInsertError.message}`);
     }
 
+<<<<<<< HEAD
     // Return the deployment URL
     return deployment.url;
+=======
+    // 배포된 프로젝트의 URL 반환
+    const deploymentURL = deployment.url;
+    const projectID = projectRow.id;
+    return { deploymentURL, projectID };
+>>>>>>> whiteboard
   } catch (error) {
     console.error(error);
     throw error;
