@@ -19,6 +19,8 @@ export default async function Home() {
     } catch (error) {
       return <UI myProjects={[]} />;
     }
+  } else {
+    return <UI myProjects={[]} />;
   }
 }
 
