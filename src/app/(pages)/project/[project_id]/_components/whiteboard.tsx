@@ -36,6 +36,7 @@ import generateApplicationCodeUseCase from "@/application/use_cases/generate_app
 import { useRouter } from "next/navigation";
 import generatePresentationPageSpecUseCase from "@/application/use_cases/generate_presentation_page_spec.use_case";
 import generatePresentationComponentSpecUseCase from "@/application/use_cases/generate_presentation_component_spec.use_case";
+import generatePresenationComponentCodeUseCase from "@/application/use_cases/generate_presentation_component_code.use_case";
 
 type NodeUI = {
   id: string;
@@ -299,15 +300,120 @@ export default function Whiteboard({ projectId }: { projectId: string }) {
         createNewNode("USE_CASE_CODE", data);
       });
     } else if (action === ACTIONS[3]) {
+      // "Generate Page Spec",
+      console.log(inputJson);
       const outputs = await generatePresentationPageSpecUseCase(inputJson, projectId);
       for (const output of outputs) {
-        const data = JSON.stringify(output);
-        createNewNode("PRESENTATION_PAGE_SPEC", data);
-        const componentsSpecs = await generatePresentationComponentSpecUseCase(data, inputJson, projectId);
+        const newPageSpec = JSON.stringify(output);
+        const pageSpecNodeId = (await createNewNode("PRESENTATION_PAGE_SPEC", newPageSpec)) as string;
+        const componentsSpecs = await generatePresentationComponentSpecUseCase(newPageSpec, inputJson, projectId);
         for (const componentSpec of componentsSpecs) {
-          const componentData = JSON.stringify(componentSpec);
+          const componenSpecIncluidngPageId = {
+            ...componentSpec,
+            page_id: pageSpecNodeId,
+          };
+          const componentData = JSON.stringify(componenSpecIncluidngPageId);
           createNewNode("PRESENTATION_COMPONENT_SPEC", componentData);
         }
+      }
+    } else if (action === ACTIONS[4]) {
+      const componentSpecNodes = nodes.filter((node) => node.type === "PRESENTATION_COMPONENT_SPEC");
+      const pageSpecNodes = nodes.filter((node) => node.type === "PRESENTATION_PAGE_SPEC");
+      const schemaNodes = nodes.filter((node) => node.type === "SCHEMA_TABLE");
+      const useCaseCodeNodes = nodes.filter((node) => node.type === "USE_CASE_CODE");
+
+      for (const componentSpecNode of componentSpecNodes) {
+        const parentPageSpecNodeId = JSON.parse(componentSpecNode.data.defaultText).page_id;
+        const parentPageSpecNode = pageSpecNodes.find((node) => node.id === parentPageSpecNodeId) as NodeUI;
+
+        const componentSpecNodeJson = JSON.stringify({
+          id: componentSpecNode.id,
+          type: componentSpecNode.type,
+          data: componentSpecNode.data.defaultText,
+        });
+        const parentPageSpecNodeJson = JSON.stringify({
+          id: parentPageSpecNode.id,
+          type: parentPageSpecNode.type,
+          data: parentPageSpecNode.data.defaultText,
+        });
+        const schemaNodesJson = JSON.stringify(
+          schemaNodes.map((node) => ({
+            id: node.id,
+            type: node.type,
+            data: node.data.defaultText,
+          }))
+        );
+        const useCaseCodeNodesJson = JSON.stringify(
+          useCaseCodeNodes.map((node) => ({
+            id: node.id,
+            type: node.type,
+            data: node.data.defaultText,
+          }))
+        );
+
+        const output = await generatePresenationComponentCodeUseCase(
+          componentSpecNodeJson,
+          schemaNodesJson,
+          parentPageSpecNodeJson,
+          useCaseCodeNodesJson,
+          projectId
+        );
+        const componenCodeIncluidngPageId = {
+          ...output,
+          page_id: parentPageSpecNodeId,
+        };
+        const data = JSON.stringify(componenCodeIncluidngPageId);
+        createNewNode("PRESENTATION_COMPONENT", data);
+      }
+    } else if (action === ACTIONS[5]) {
+      const pageSpecNodes = nodes.filter((node) => node.type === "PRESENTATION_PAGE_SPEC");
+      const componentCodeNodes = nodes.filter((node) => node.type === "PRESENTATION_COMPONENT");
+      const schemaNodes = nodes.filter((node) => node.type === "SCHEMA_TABLE");
+      const useCaseCodeNodes = nodes.filter((node) => node.type === "USE_CASE_CODE");
+
+      for (const pageSpecNode of pageSpecNodes) {
+        const filteredComponentCodeNodes = componentCodeNodes.filter((node) => {
+          return JSON.parse(node.data.defaultText).page_id === pageSpecNode.id;
+        }) as NodeUI[];
+
+        const pageSpecNodeJson = JSON.stringify({
+          id: pageSpecNode.id,
+          type: pageSpecNode.type,
+          data: pageSpecNode.data.defaultText,
+        });
+        const componentCodeNodesJson = JSON.stringify(
+          filteredComponentCodeNodes.map((node) => ({
+            id: node.id,
+            type: node.type,
+            data: node.data.defaultText,
+          }))
+        );
+
+        const schemaNodesJson = JSON.stringify(
+          schemaNodes.map((node) => ({
+            id: node.id,
+            type: node.type,
+            data: node.data.defaultText,
+          }))
+        );
+
+        const useCaseCodeNodesJson = JSON.stringify(
+          useCaseCodeNodes.map((node) => ({
+            id: node.id,
+            type: node.type,
+            data: node.data.defaultText,
+          }))
+        );
+
+        const output = await generatePresenationComponentCodeUseCase(
+          pageSpecNodeJson,
+          componentCodeNodesJson,
+          useCaseCodeNodesJson,
+          schemaNodesJson,
+          projectId
+        );
+        const data = JSON.stringify(output);
+        createNewNode("PRESENTATION_COMPONENT", data);
       }
     }
   };

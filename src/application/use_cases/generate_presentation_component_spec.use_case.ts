@@ -11,8 +11,8 @@ interface PresentationComponentSpecResponse {
 }
 
 export default async function generatePresentationComponentSpecUseCase(
-  inputJson: string,
-  extraData: string,
+  pageSpecJson: string,
+  extraNodeJson: string,
   projectID: string
 ) {
   // presentation 관련 node 가져와서 페이지 구조 생성
@@ -26,7 +26,7 @@ export default async function generatePresentationComponentSpecUseCase(
       role: "system",
       content: [
         {
-          text: 'You are a expert software engineer. You need to define client component\'s spec that given page needs of web application. The product could be any kind of web application.\n- Our framework is nextjs14 using app router with server side rendering (aka server component), page structure should be stick to it.\n- We define client component at _components folder inside same page.tsx file path\n-- The _components folder only has components that used at page.tsx\n--example: url: /projects/[project_id] -> filepath of this components: src/app/(main)/projects/[project_id]/_components/example.tsx\n- component file name should be \bskewer case, and component name should be pascal case.\n- component for layout, which is used repeatedly over pages, do not considered in this case. we already add it to layout.tsx, like header or footer etc\n- We always use Shadcn UI for UI components, specify what component could be used at description.\n-- List of Shadcn UI components: \naccordion, alert-dialog, alert, aspect-ratio, avatar, badge, breadcrumb, button, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer, dropdown-menu, form, hover-card, input-otp, input, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, skeleton, sonner, switch, table, tabs, textarea, toast, toaster, toggle-group, toggle, tooltip\n\n[{"filename": file name of component, "filepath": detailed filepath for this page, "description": what props and state should this component have, what UI logic, what shadcn componentn it uses}]\n- description should be very detailed that any programmer could write page.tsx code without your help.\n- Do not write code yet.',
+          text: 'You are a expert software engineer. You need to define client component\'s spec that given page needs of web application. The product could be any kind of web application.\n- Our framework is nextjs14 using app router with server side rendering (aka server component), page structure should be stick to it.\n- We define client component at _components folder inside same page.tsx file path\n-- The _components folder only has components that used at page.tsx\n--example: url: /projects/[project_id] -> filepath of this components: src/app/(main)/projects/[project_id]/_components/example.tsx\n- component file name should be \bskewer case, and component name should be pascal case.\n- component for layout, which is used repeatedly over pages, do not create in this case. we already have components like header or footer etc at layout.tsx\n- We always use Shadcn UI for UI components, specify what component could be used at description.\n-- List of Shadcn UI components: \naccordion, alert-dialog, alert, aspect-ratio, avatar, badge, breadcrumb, button, calendar, card, carousel, chart, checkbox, collapsible, command, context-menu, dialog, drawer, dropdown-menu, form, hover-card, input-otp, input, label, menubar, navigation-menu, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, skeleton, sonner, switch, table, tabs, textarea, toast, toaster, toggle-group, toggle, tooltip\n\n[{"filename": file name of component, "filepath": detailed filepath for this page, "description": what props and state should this component have, what UI logic, what shadcn componentn it uses}]\n- description should be very detailed that any programmer could write page.tsx code without your help.\n- Do not write code yet.',
           type: "text",
         },
       ],
@@ -36,7 +36,7 @@ export default async function generatePresentationComponentSpecUseCase(
       content: [
         {
           type: "text",
-          text: inputJson,
+          text: pageSpecJson,
         },
       ],
     },
@@ -45,7 +45,7 @@ export default async function generatePresentationComponentSpecUseCase(
       content: [
         {
           type: "text",
-          text: extraData,
+          text: extraNodeJson,
         },
       ],
     },
