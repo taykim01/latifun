@@ -185,7 +185,7 @@ export default async function createEmptyProjectUseCase(formData: FormValues) {
     }
 
     // Supabase Management API logic starts here
-    let supabaseUrl = projectRow.supabase_url;
+    const supabaseUrl = projectRow.supabase_url;
     if (!supabaseUrl) {
       console.log("Retrieving Supabase organizations...");
       const orgsResponse = await fetch("https://api.supabase.com/v1/organizations", {

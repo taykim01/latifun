@@ -37,12 +37,10 @@ export default function ResultsBar(props: { open: boolean; onClose: () => void }
         <div className="flex flex-col gap-3">
           <div className="text-lg font-semibold">How to use Latifun Whiteboard:</div>
           <ol className="text-sm list-decimal flex pl-5 flex-col gap-3">
-            <li>
-              Create a new node by selecting the type from the dropdown and clicking the "Create New Node" button.
-            </li>
+            <li>Create a new node by selecting the type from the dropdown and clicking the Create New Node button.</li>
             <li>Connect two nodes by dragging from one node to another.</li>
-            <li>Delete a node or edge by selecting it and clicking the "Delete" button on your keyboard.</li>
-            <li>Click the "Do Some Action" button to make some actions.</li>
+            <li>Delete a node or edge by selecting it and clicking the Delete button on your keyboard.</li>
+            <li>Click the Do Some Action button to make some actions.</li>
           </ol>
         </div>
         <hr />
